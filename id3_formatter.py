@@ -38,17 +38,17 @@ if __name__=="__main__":
                 txt=re.sub(r"\s*www\..*\.com","",txt)
                 txt=re.sub(r"\s*.*\.com","",txt)
                 if txt:
-                    if key=="TPE1":
+                    if key=="TPE1":   # Artists
                         audio['TPE1']=TPE1(encoding=3,text=txt)
-                    elif key=="TPE2":
+                    elif key=="TPE2": # Band
                         audio['TPE2']=TPE2(encoding=3,text=txt)
-                    elif key=="TIT2":
+                    elif key=="TIT2": # Title
                         audio['TIT2']=TIT2(encoding=3,text=txt)
-                    elif key=="TALB":
+                    elif key=="TALB": # Album
                         audio['TALB']=TALB(encoding=3,text=txt)
-                    elif key=="TCON":
+                    elif key=="TCON": # Genre
                         audio['TCON']=TCON(encoding=3,text=txt)
-                    elif key=="TPUB":
+                    elif key=="TPUB": # Publisher
                         audio['TPUB']=TPUB(encoding=3,text=txt)
                 else:
                     audio.setall(key,[]) # Remove key if no string remains
