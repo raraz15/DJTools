@@ -8,6 +8,8 @@ from mutagen.id3 import ID3,TPE1,TPE2,TIT2,TALB,TCON,TPUB
 
 KEYS=["APIC","TDRC","TDRL","TDOR","TPE1","TIT2","TALB","TCON","TPUB","TDRL"]
 
+# TODO: Beatport Search to fill empty tags
+# TODO: Download Cove if it does not exist
 if __name__=="__main__":
 
     parser=argparse.ArgumentParser()
