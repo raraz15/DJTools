@@ -56,6 +56,7 @@ if __name__=="__main__":
     file_names=[]
     for ext in EXT:
         file_names+=[os.path.basename(path) for path in glob(f"{args.path}/*{ext}")]
+    file_names=sorted(file_names)
     # Clean the names
     clean_file_names=[]
     for file_name in file_names:
