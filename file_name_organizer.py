@@ -7,6 +7,8 @@ from shutil import move
 EXT=[".mp3",".flac",".wav"]
 
 def clean_file_name(file_name):
+    """Expects the file name without the extension."""
+    
     file_name=re.sub(r"\A[^a-zA-Z]+","",file_name) # Track number, or leading whitespaces
     file_name=re.sub(r"\s+\Z","",file_name) # Trailing whitespaces
     file_name=re.sub(r"\s\s+"," ",file_name) # Multiple whitespaces
