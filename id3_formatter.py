@@ -1,12 +1,15 @@
 import os
 import sys
+import re
 import requests
 from glob import glob
 import argparse
-import re
+from shutil import move
 
 from mutagen import File
 from mutagen.id3 import ID3,APIC,TDRL,TPE1,TIT2,TALB,TCON,TPUB
+
+from file_name_organizer import clean_file_name
 
 sys.path.append("/Users/recep_oguz_araz/Projects/electronic_music_downloader")
 
@@ -21,19 +24,28 @@ KEYS=["APIC", # Image
     "TCON",   # Genre
     "TPUB"]   # Publisher
 
-# TODO: Clean file names first
 if __name__=="__main__":
 
     parser=argparse.ArgumentParser()
     parser.add_argument("-p","--path",type=str,required=True,help="Path to directory containing audio files.")
+    parser.add_argument("-c","--clean",type=str,required=True,help="Clean the name of the audio files.")
     args=parser.parse_args()
 
     # Find the mp3 paths 
     file_paths=sorted([path for path in glob(f"{args.path}/*.mp3")])
 
     for file_path in file_paths:
-        print(file_path)
-        _,ext=os.path.splitext(file_path)
+        print(f"Formatting the tags of: {file_path}")
+        file_name=os.path.basename(file_path)
+        file_name,ext=os.path.splitext(file_name)
+        clean_name=clean_file_name(file_name) # Required for beatport search
+        if args.clean:
+            dir_path=os.path.dirname(file_path)
+            clean_file_path=os.path.join(dir_path,clean_name+ext)
+            if file_name!=clean_name:
+                print(f"Chaning the path to: {clean_file_path}")
+                move(file_path,clean_file_path)
+                file_path=clean_file_path
         # Load the ID3
         try:
             audio=ID3(file_path)
@@ -80,8 +92,7 @@ if __name__=="__main__":
         # If any of the tags do not exist, fill the missing information
         if failed:
             # Scrape Information from beatport
-            file_name=os.path.splitext(os.path.basename(file_path))[0]
-            beatport_url=make_beatport_query(file_name)
+            beatport_url=make_beatport_query(clean_name)
             track_dict=scrape_track(beatport_url)
             # Fill each tag if necessary
             for key in KEYS:
@@ -112,5 +123,4 @@ if __name__=="__main__":
                     else:
                         continue
         audio.save(v2_version=3)
-
     print("Done!")
