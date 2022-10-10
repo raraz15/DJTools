@@ -42,14 +42,14 @@ if __name__=="__main__":
         if args.clean:
             dir_path=os.path.dirname(file_path)
             clean_file_path=os.path.join(dir_path,clean_name+ext)
-            if file_name!=clean_name:
+            if file_name!=clean_name: # Change file name if cleaning changes it
                 print(f"Chaning the path to: {clean_file_path}")
                 move(file_path,clean_file_path)
                 file_path=clean_file_path
         # Load the ID3
         try:
             audio=ID3(file_path)
-        except: # Create a simple tag
+        except: # Create a simple tag if it did not exist
             audio=File(file_path,easy=True)
             audio.add_tags()
             audio.save()
@@ -87,40 +87,45 @@ if __name__=="__main__":
 
         # Search if any of the tags don't exist
         failed=False
-        for key in KEYS: 
+        for key in KEYS:
             failed+=key not in list(audio.keys())
-        # If any of the tags do not exist, fill the missing information
-        if failed:
-            # Scrape Information from beatport
-            beatport_url=make_beatport_query(clean_name)
-            track_dict=scrape_track(beatport_url)
-            # Fill each tag if necessary
-            for key in KEYS:
-                if key not in list(audio.keys()):
-                    if key=="TPE1":
-                        txt=track_dict["Artist(s)"]
-                        audio['TPE1']=TPE1(encoding=3,text=txt)
-                    elif key=="TIT2":
-                        txt=track_dict["Title"]
-                        if track_dict["Mix"]:
-                            txt+=f" ({track_dict['Mix']})"
-                        audio['TIT2']=TIT2(encoding=3,text=txt)
-                    #elif key=="TALB":
-                    #    txt=track_dict[""]
-                    #    audio['TALB']=TALB(encoding=3,text=txt)
-                    elif key=="TCON":
-                        txt=track_dict["Genre"]
-                        audio['TCON']=TCON(encoding=3,text=txt)
-                    elif key=="TPUB":
-                        txt=track_dict["Label"]
-                        audio['TPUB']=TPUB(encoding=3,text=txt)
-                    elif key=="TDRL":
-                        txt=track_dict["Released"]
-                        audio['TDRL']=TDRL(encoding=3,text=txt)
-                    elif key=="APIC":
-                        req=requests.get(track_dict["Image URL"])
-                        audio["APIC"]=APIC(3,'image/jpg',3,'Front cover',req.content)
-                    else:
-                        continue
+        # If a tag is missing search for it in Beatport
+        try:
+            # Fill the missing information
+            if failed:
+                # Scrape Information from beatport
+                beatport_url=make_beatport_query(clean_name)
+                track_dict=scrape_track(beatport_url)
+                # Fill each tag if necessary
+                for key in KEYS:
+                    if key not in list(audio.keys()):
+                        if key=="TPE1":
+                            txt=track_dict["Artist(s)"]
+                            audio['TPE1']=TPE1(encoding=3,text=txt)
+                        elif key=="TIT2":
+                            txt=track_dict["Title"]
+                            if track_dict["Mix"]:
+                                txt+=f" ({track_dict['Mix']})"
+                            audio['TIT2']=TIT2(encoding=3,text=txt)
+                        #elif key=="TALB":
+                        #    txt=track_dict[""]
+                        #    audio['TALB']=TALB(encoding=3,text=txt)
+                        elif key=="TCON":
+                            txt=track_dict["Genre"]
+                            audio['TCON']=TCON(encoding=3,text=txt)
+                        elif key=="TPUB":
+                            txt=track_dict["Label"]
+                            audio['TPUB']=TPUB(encoding=3,text=txt)
+                        elif key=="TDRL":
+                            txt=track_dict["Released"]
+                            audio['TDRL']=TDRL(encoding=3,text=txt)
+                        elif key=="APIC":
+                            req=requests.get(track_dict["Image URL"])
+                            audio["APIC"]=APIC(3,'image/jpg',3,'Front cover',req.content)
+                        else:
+                            continue
+        except:
+            print("Beatport search or filling failed!")
+            pass
         audio.save(v2_version=3)
     print("Done!")
