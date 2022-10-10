@@ -1,30 +1,43 @@
 import os
+import sys
+import requests
 from glob import glob
 import argparse
 import re
 
 from mutagen import File
-from mutagen.id3 import ID3,TPE1,TPE2,TIT2,TALB,TCON,TPUB
+from mutagen.id3 import ID3,APIC,TDRL,TPE1,TIT2,TALB,TCON,TPUB
 
-KEYS=["APIC","TDRC","TDRL","TDOR","TPE1","TIT2","TALB","TCON","TPUB","TDRL"]
+sys.path.append("/Users/recep_oguz_araz/Projects/electronic_music_downloader")
 
-# TODO: Beatport Search to fill empty tags
-# TODO: Download Cove if it does not exist
+from emd.beatport.searcher import make_beatport_query
+from emd.beatport.track_scraper import scrape_track
+
+KEYS=["APIC", # Image
+    "TDRL",   # ReleaseTime
+    "TPE1",   # Artist
+    "TIT2",   # Title
+    "TALB",   # Album
+    "TCON",   # Genre
+    "TPUB"]   # Publisher
+
+# TODO: Clean file names first
 if __name__=="__main__":
 
     parser=argparse.ArgumentParser()
     parser.add_argument("-p","--path",type=str,required=True,help="Path to directory containing audio files.")
     args=parser.parse_args()
 
+    # Find the mp3 paths 
     file_paths=sorted([path for path in glob(f"{args.path}/*.mp3")])
 
     for file_path in file_paths:
+        print(file_path)
         _,ext=os.path.splitext(file_path)
-        if ext!=".mp3":
-            continue
+        # Load the ID3
         try:
             audio=ID3(file_path)
-        except: # Create the simple tag
+        except: # Create a simple tag
             audio=File(file_path,easy=True)
             audio.add_tags()
             audio.save()
@@ -33,24 +46,71 @@ if __name__=="__main__":
         for key in list(audio.keys()):
             if key not in KEYS:
                 audio.setall(key,[])
-        # Clean the tags from URLs
+        # Clean and format the tags
         for key in list(audio.keys()):
-            if "APIC" not in key and key!="TDRC" and key!="TDRL" and key!="TDOR": # Check each key except the image
+            # Only check non-image and non-time-stamp keys
+            if  key not in["APIC","TDRL"]:
+                # Strip the url
                 txt=audio[key].text[0]
                 txt=re.sub(r"\s*www\..*\.com","",txt)
                 txt=re.sub(r"\s*.*\.com","",txt)
+                # Clean the tag
+                txt=re.sub(r"\s\s+"," ",txt) # Multiple
+                txt=re.sub(r"\A\s+","",txt) # Leading
+                txt=re.sub(r"\s+\Z","",txt) # Trailing
+                # Put it where it belongs, if a text is remaining
                 if txt:
-                    if key=="TPE1":   # Artists
+                    if key=="TPE1":
                         audio['TPE1']=TPE1(encoding=3,text=txt)
-                    elif key=="TPE2": # Band
-                        audio['TPE2']=TPE2(encoding=3,text=txt)
-                    elif key=="TIT2": # Title
+                    elif key=="TIT2":
                         audio['TIT2']=TIT2(encoding=3,text=txt)
-                    elif key=="TALB": # Album
+                    elif key=="TALB":
                         audio['TALB']=TALB(encoding=3,text=txt)
-                    elif key=="TCON": # Genre
+                    elif key=="TCON":
                         audio['TCON']=TCON(encoding=3,text=txt)
-                    elif key=="TPUB": # Publisher
+                    elif key=="TPUB":
                         audio['TPUB']=TPUB(encoding=3,text=txt)
                 else:
                     audio.setall(key,[]) # Remove key if no string remains
+
+        # Search if any of the tags don't exist
+        failed=False
+        for key in KEYS: 
+            failed+=key not in list(audio.keys())
+        # If any of the tags do not exist, fill the missing information
+        if failed:
+            # Scrape Information from beatport
+            file_name=os.path.splitext(os.path.basename(file_path))[0]
+            beatport_url=make_beatport_query(file_name)
+            track_dict=scrape_track(beatport_url)
+            # Fill each tag if necessary
+            for key in KEYS:
+                if key not in list(audio.keys()):
+                    if key=="TPE1":
+                        txt=track_dict["Artist(s)"]
+                        audio['TPE1']=TPE1(encoding=3,text=txt)
+                    elif key=="TIT2":
+                        txt=track_dict["Title"]
+                        if track_dict["Mix"]:
+                            txt+=f" ({track_dict['Mix']})"
+                        audio['TIT2']=TIT2(encoding=3,text=txt)
+                    #elif key=="TALB":
+                    #    txt=track_dict[""]
+                    #    audio['TALB']=TALB(encoding=3,text=txt)
+                    elif key=="TCON":
+                        txt=track_dict["Genre"]
+                        audio['TCON']=TCON(encoding=3,text=txt)
+                    elif key=="TPUB":
+                        txt=track_dict["Label"]
+                        audio['TPUB']=TPUB(encoding=3,text=txt)
+                    elif key=="TDRL":
+                        txt=track_dict["Released"]
+                        audio['TDRL']=TDRL(encoding=3,text=txt)
+                    elif key=="APIC":
+                        req=requests.get(track_dict["Image URL"])
+                        audio["APIC"]=APIC(3,'image/jpg',3,'Front cover',req.content)
+                    else:
+                        continue
+        audio.save(v2_version=3)
+
+    print("Done!")
