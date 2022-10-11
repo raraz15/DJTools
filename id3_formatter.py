@@ -23,6 +23,7 @@ KEYS=["APIC", # Image
     "TCON",   # Genre
     "TPUB"]   # Publisher
 
+# TODO: during beatport search if track has tags, use them
 def main(file_path,clean):
     file_name=os.path.basename(file_path)
     file_name,ext=os.path.splitext(file_name)
@@ -31,10 +32,11 @@ def main(file_path,clean):
         dir_path=os.path.dirname(file_path)
         clean_file_path=os.path.join(dir_path,clean_name+ext)
         if file_name!=clean_name: # Change file name if cleaning changes it
-            print(f"Changing the name to: {clean_name}")
+            print(f"Changing the name to:\n{clean_name}")
             move(file_path,clean_file_path)
             file_path=clean_file_path
     # Load the ID3
+    print(f"Cleaning the tags...")
     try:
         audio=ID3(file_path)
     except: # Create a simple tag if it did not exist
@@ -79,6 +81,7 @@ def main(file_path,clean):
     try:
         # Fill the missing information
         if failed:
+            print("Some of the tags are missing. Making a Beatport query....")
             # Scrape Information from beatport
             beatport_url=make_beatport_query(clean_name)
             track_dict=scrape_track(beatport_url)
@@ -119,12 +122,14 @@ if __name__=="__main__":
     parser.add_argument("-c","--clean",action="store_true",help="Clean the name of the audio files.")
     args=parser.parse_args()
 
-    # Find the mp3 paths 
+    # Find the mp3 paths
     file_paths=sorted([path for path in glob(f"{args.path}/*.mp3")])
+    print(f"{len(file_paths)} tracks found in:\n{args.path}")
 
-    for file_path in file_paths:
-        print(f"Input file:\n{file_path}")
-        print(f"Formatting the tags...")
+    print("Starting the formatting...")
+    for i,file_path in enumerate(file_paths):
+        print(f"{i+1}/{len(file_paths)}")
+        print(f"Input name:\n{os.path.basename(file_path)}")
         try:
             main(file_path,args.clean)
         except KeyboardInterrupt:
