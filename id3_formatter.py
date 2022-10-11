@@ -20,22 +20,26 @@ KEYS=["APIC", # Image
     "TDRL",   # ReleaseTime
     "TPE1",   # Artist
     "TIT2",   # Title
-    "TALB",   # Album
+    #"TALB",   # Album
     "TCON",   # Genre
     "TPUB"]   # Publisher
+
+#        except KeyboardInterrupt:
+#            sys.exit()
 
 if __name__=="__main__":
 
     parser=argparse.ArgumentParser()
     parser.add_argument("-p","--path",type=str,required=True,help="Path to directory containing audio files.")
-    parser.add_argument("-c","--clean",type=str,required=True,help="Clean the name of the audio files.")
+    parser.add_argument("-c","--clean",action="store_true",help="Clean the name of the audio files.")
     args=parser.parse_args()
 
     # Find the mp3 paths 
     file_paths=sorted([path for path in glob(f"{args.path}/*.mp3")])
 
     for file_path in file_paths:
-        print(f"Formatting the tags of: {file_path}")
+        print(f"Input file:\n{file_path}")
+        print(f"Formatting the tags...")
         file_name=os.path.basename(file_path)
         file_name,ext=os.path.splitext(file_name)
         clean_name=clean_file_name(file_name) # Required for beatport search
@@ -43,7 +47,7 @@ if __name__=="__main__":
             dir_path=os.path.dirname(file_path)
             clean_file_path=os.path.join(dir_path,clean_name+ext)
             if file_name!=clean_name: # Change file name if cleaning changes it
-                print(f"Chaning the path to: {clean_file_path}")
+                print(f"Changing the name to: {clean_name}")
                 move(file_path,clean_file_path)
                 file_path=clean_file_path
         # Load the ID3
@@ -76,8 +80,8 @@ if __name__=="__main__":
                         audio['TPE1']=TPE1(encoding=3,text=txt)
                     elif key=="TIT2":
                         audio['TIT2']=TIT2(encoding=3,text=txt)
-                    elif key=="TALB":
-                        audio['TALB']=TALB(encoding=3,text=txt)
+                    #elif key=="TALB":
+                    #    audio['TALB']=TALB(encoding=3,text=txt)
                     elif key=="TCON":
                         audio['TCON']=TCON(encoding=3,text=txt)
                     elif key=="TPUB":
@@ -124,8 +128,11 @@ if __name__=="__main__":
                             audio["APIC"]=APIC(3,'image/jpg',3,'Front cover',req.content)
                         else:
                             continue
-        except:
+        except KeyboardInterrupt:
+            sys.exit()
+        except Exception as ex:
             print("Beatport search or filling failed!")
             pass
         audio.save(v2_version=3)
+        print()
     print("Done!")
