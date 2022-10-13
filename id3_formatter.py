@@ -40,15 +40,15 @@ if __name__=="__main__":
     print(f"{len(file_paths)} tracks found in:\n{args.path}")
 
     print("Starting the formatting...")
-    for i,file_path in enumerate(file_paths):
-        print("="*75)
-        print(f"{i+1}/{len(file_paths)}")
-        file_name=os.path.basename(file_path)
-        print(f"Input name:\n{file_name}")
-        file_name,ext=os.path.splitext(file_name)
-        # File name cleaning
-        clean_name=clean_file_name(file_name) # Required for beatport search
-        try:
+    try:
+        for i,file_path in enumerate(file_paths):
+            print("="*80)
+            print(f"{i+1}/{len(file_paths)}")
+            file_name=os.path.basename(file_path)
+            print(f"Input name:\n{file_name}")
+            file_name,ext=os.path.splitext(file_name)
+            # File name cleaning
+            clean_name=clean_file_name(file_name) # Required for beatport search
             if args.clean:
                 dir_path=os.path.dirname(file_path)
                 clean_file_path=os.path.join(dir_path,clean_name+ext)
@@ -56,27 +56,20 @@ if __name__=="__main__":
                     print(f"Changing the name to:\n{clean_name+ext}")
                     move(file_path,clean_file_path)
                     file_path=clean_file_path
-        except KeyboardInterrupt:
-            sys.exit()
-            
-        # Load the ID3 if not flac
-        if ext==".flac":
-            print(".flac file not messing with the tags")
-            continue
-        print("Loading the audio...")
-        try:
-            audio=ID3(file_path)
-        except KeyboardInterrupt:
-            sys.exit()
-        except:
-            # Create a simple tag if it did not exist
-            audio=File(file_path,easy=True)
-            audio.add_tags()
-            audio.save()
-            audio=ID3(file_path)
+            # Load the ID3 if not flac
+            if ext==".flac" or ext==".wav":
+                print(".flac or .wav, file not messing with the tags.")
+                continue
+            try:
+                audio=ID3(file_path)
+            except:
+                # Create a simple tag if it did not exist
+                audio=File(file_path,easy=True)
+                audio.add_tags()
+                audio.save()
+                audio=ID3(file_path)
 
-        try:
-            print(f"Cleaning the tags...")
+            print(f"Cleaning the existing tags...")
             # Remove unnecessary keys directly
             for key in list(audio.keys()):
                 if key not in KEYS:
@@ -115,38 +108,39 @@ if __name__=="__main__":
                 print("Some of the tags are missing. Making a Beatport query....")
                 # Scrape Information from beatport
                 beatport_url=make_beatport_query(clean_name)
-                track_dict=scrape_track(beatport_url)
-                # Fill each tag if missing
-                for key in KEYS:
-                    if key not in list(audio.keys()):
-                        if key=="TPE1":
-                            txt=track_dict["Artist(s)"]
-                            audio['TPE1']=TPE1(encoding=3,text=txt)
-                        elif key=="TIT2":
-                            txt=track_dict["Title"]
-                            if track_dict["Mix"]:
-                                txt+=f" ({track_dict['Mix']})"
-                            audio['TIT2']=TIT2(encoding=3,text=txt)
-                        elif key=="TCON":
-                            txt=track_dict["Genre"]
-                            audio['TCON']=TCON(encoding=3,text=txt)
-                        elif key=="TPUB":
-                            txt=track_dict["Label"]
-                            audio['TPUB']=TPUB(encoding=3,text=txt)
-                        elif key=="TDRL":
-                            txt=track_dict["Released"]
-                            audio['TDRL']=TDRL(encoding=3,text=txt)
-                        elif key=="APIC":
-                            req=requests.get(track_dict["Image URL"])
-                            audio["APIC"]=APIC(3,'image/jpg',3,'Front cover',req.content)
-                        else:
-                            continue
-        except KeyboardInterrupt:
-            sys.exit()
-        except:
-            print("Something went wrong during tag formatting.")
-            pass
-        # Save the tags
-        audio.save(v2_version=3)
-        print("Saved the tags!")
+                print(f"Beatport URL: {beatport_url}")
+                if not beatport_url:
+                    print("Beatport search failed.")
+                else:
+                    track_dict=scrape_track(beatport_url)
+                    # Fill each tag if missing
+                    for key in KEYS:
+                        if key not in list(audio.keys()):
+                            if key=="TPE1":
+                                txt=track_dict["Artist(s)"]
+                                audio['TPE1']=TPE1(encoding=3,text=txt)
+                            elif key=="TIT2":
+                                txt=track_dict["Title"]
+                                if track_dict["Mix"]:
+                                    txt+=f" ({track_dict['Mix']})"
+                                audio['TIT2']=TIT2(encoding=3,text=txt)
+                            elif key=="TCON":
+                                txt=track_dict["Genre"]
+                                audio['TCON']=TCON(encoding=3,text=txt)
+                            elif key=="TPUB":
+                                txt=track_dict["Label"]
+                                audio['TPUB']=TPUB(encoding=3,text=txt)
+                            elif key=="TDRL":
+                                txt=track_dict["Released"]
+                                audio['TDRL']=TDRL(encoding=3,text=txt)
+                            elif key=="APIC":
+                                req=requests.get(track_dict["Image URL"])
+                                audio["APIC"]=APIC(3,'image/jpg',3,'Front cover',req.content)
+                            else:
+                                continue
+            # Save the tags
+            audio.save(v2_version=3)
+            print("Saved the tags!")
+    except KeyboardInterrupt:
+        sys.exit()
     print("Done!")
