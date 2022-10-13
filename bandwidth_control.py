@@ -1,6 +1,7 @@
 import os
 from glob import glob
 import time
+import argparse
 import scipy
 import numpy as np
 
@@ -9,21 +10,22 @@ import matplotlib.pyplot as plt
 import librosa
 import librosa.display
 
-def check_bandwidth(y,nfft,L,sr,qt,thresh=-80):
+def check_bandwidth(y,nfft,L,sr,qt,thresh=-110):
     # Calculate the spectrogram
     S=np.abs(librosa.stft(y,n_fft=nfft,hop_length=L))
     S_db=librosa.amplitude_to_db(S,ref=np.max,top_db=-thresh)
     F,T=S_db.shape
+    F_start=4*F//5
     # Find the maximum frequency bin with energy
     indices=[]
     for t in range(T):
-        spectrum=S_db[(3*F//4):,t] # Look at the top part
+        spectrum=S_db[F_start:,t] # Look at the top part
         energy_indices=np.where(spectrum>thresh)[0]
         if energy_indices.any():
             energy_indices=(energy_indices//qt)*qt # quantize the energy bins
             max_idx=np.max(energy_indices)
             if max_idx>0: # The middle of the spectrum is not important
-                indices.append((3*F//4)+max_idx)
+                indices.append(F_start+max_idx)
     # The mode of this sequence indicates the bandwidth
     mode=scipy.stats.mode(indices)
     if len(mode.mode)>0:
@@ -51,16 +53,26 @@ def plot_spectrogram(spec,nfft,L,sr,title,save_dir=""):
         fig.savefig(save_path)
     plt.close()
 
-
+# TODO: Check clipping
 if __name__=="__main__":
 
-    music_dir="/Users/recep_oguz_araz/Soulseek Downloads"
+    parser=argparse.ArgumentParser()
+    parser.add_argument("-p","--path",type=str,required=True,help="Path to directory containing audio files.")
+    parser.add_argument("-o","--output",type=str,required=True,help="Directory for saving the sptectrograms.")
+    args=parser.parse_args()
+
     nfft=4096
     L=nfft//2
     qt=5
-    T=180 # seconds
+    thresh=-110
+    T=240 # seconds
 
-    file_paths=sorted([path for path in glob(f"{music_dir}/*.mp3")])
+    success_dir=os.path.join(args.output,"success")
+    fail_dir=os.path.join(args.output,"fail")
+    os.makedirs(success_dir,exist_ok=True)
+    os.makedirs(fail_dir,exist_ok=True)
+
+    file_paths=sorted([path for path in glob(f"{args.path}/*.mp3")])
     total_time=0
     for file_path in file_paths:
         start_time=time.time()
@@ -70,10 +82,16 @@ if __name__=="__main__":
         if T<len(y)/sr:
             n=np.random.randint(0,len(y)-T*sr)
             y=y[n:n+T*sr] # Shorten the audio signal
-        spec,bandwidth=check_bandwidth(y,nfft,L,sr,qt)
-        if bandwidth<19000:
+        spec,bandwidth=check_bandwidth(y,nfft,L,sr,qt,thresh=thresh)
+        #print(np.mean(spec,axis=1))
+        print(f"Detected bandwidth: {bandwidth:.1f}Hz")
+        if bandwidth<19500:
             title=os.path.basename(file_path)
-            plot_spectrogram(spec,nfft,L,sr,title,"Figures")
+            plot_spectrogram(spec,nfft,L,sr,title,fail_dir)
+        else:
+            title=os.path.basename(file_path)
+            plot_spectrogram(spec,nfft,L,sr,title,success_dir)
         end_time=time.time()
         total_time+=end_time-start_time
+        print(f"{end_time-start_time:.4f} seconds file")
 print(f"{total_time:.2f} seconds total processing")
