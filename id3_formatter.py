@@ -22,11 +22,13 @@ KEYS=["APIC", # Image
     "TIT2",   # Title
     "TCON",   # Genre
     "TPUB"]   # Publisher
+EXT=[".mp3",".flac",".wav"]
 
 # TODO: during beatport search if track has tags, use them
 def main(file_path,clean):
     file_name=os.path.basename(file_path)
     file_name,ext=os.path.splitext(file_name)
+    # File name cleaning
     clean_name=clean_file_name(file_name) # Required for beatport search
     if clean:
         dir_path=os.path.dirname(file_path)
@@ -39,7 +41,8 @@ def main(file_path,clean):
     print(f"Cleaning the tags...")
     try:
         audio=ID3(file_path)
-    except: # Create a simple tag if it did not exist
+    except:
+        # Create a simple tag if it did not exist
         audio=File(file_path,easy=True)
         audio.add_tags()
         audio.save()
@@ -122,8 +125,11 @@ if __name__=="__main__":
     parser.add_argument("-c","--clean",action="store_true",help="Clean the name of the audio files.")
     args=parser.parse_args()
 
-    # Find the mp3 paths
-    file_paths=sorted([path for path in glob(f"{args.path}/*.mp3")])
+    # Find the audio file paths
+    file_paths=[]
+    for ext in EXT:
+        file_paths+=[path for path in glob(f"{args.path}/*{ext}")]
+    file_paths=sorted(file_paths)
     print(f"{len(file_paths)} tracks found in:\n{args.path}")
 
     print("Starting the formatting...")
