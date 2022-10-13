@@ -9,7 +9,12 @@ EXT=[".mp3",".flac",".wav"]
 # TODO: , with ,\s
 def clean_file_name(file_name):
     """Expects the file name without the extension."""
-    
+
+    if " " not in file_name:
+        # if_the_file-name_is_like_this
+        file_name=re.sub("_"," ",file_name)
+        file_name=re.sub("-"," - ",file_name)
+        file_name=file_name.title()
     file_name=re.sub(r"\A[^a-zA-Z]+","",file_name) # Track number, or leading whitespaces
     file_name=re.sub(r"\s+\Z","",file_name) # Trailing whitespaces
     file_name=re.sub(r"\s\s+"," ",file_name) # Multiple whitespaces
@@ -47,6 +52,8 @@ def clean_file_name(file_name):
     file_name=re.sub(";",",",file_name)
     # - remains in the end
     file_name=re.sub(r"\s\-\s+\Z","",file_name)
+    # Easy fix
+    file_name=re.sub("Dj","DJ",file_name)
     return file_name
 
 # TODO: look at version, audio length...
@@ -111,10 +118,18 @@ if __name__=="__main__":
     file_names=sorted(file_names)
     # Clean the names
     clean_file_names=[]
-    for file_name in file_names:
+    for i,file_name in enumerate(file_names):
         file_name,ext=os.path.splitext(file_name)
-        clean_name=clean_file_name(file_name)
-        clean_file_names.append((file_name+ext,clean_name+ext))
+        print(f"\n{i+1}/{len(file_names)}")
+        print(f"Input name:\n{file_name}")
+        try:
+            clean_name=clean_file_name(file_name)
+            print(f"Cleaned name:\n{clean_name}")
+            clean_file_names.append((file_name+ext,clean_name+ext))
+        except:
+            print("="*40)
+            print("File name couldn't be cleaned!")
+            print("="*40)
     # Change the names
     for file_name,clean_name in clean_file_names:
         if file_name!=clean_name:
