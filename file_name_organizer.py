@@ -24,7 +24,7 @@ def clean_file_name(file_name):
     m=re.search(r"\([^\)]*[M|m]ix\)",file_name)
     if m: # Capitalize Mix type
         file_name=file_name[:m.start()]+f"{m[0]}".title()+file_name[m.end():]
-    file_name=re.sub(r"www\..*\.com","",file_name)
+    file_name=re.sub(r"www\..*\.[com|net]","",file_name)
     # Deal with feat
     file_name=re.sub(r"Feat|Ft|ft",r"feat",file_name)
     m=re.search(r"feat",file_name)
@@ -41,8 +41,7 @@ def clean_file_name(file_name):
         idx=file_name.find(remixer)
         if m.start()+7!=idx:
             file_name=file_name[:idx-2]+file_name[idx+len(remixer):]
-    # Change the (feat. ) position
-    if "(feat. " in file_name:
+    if "(feat. " in file_name: # - remains in the end
         idx=file_name.find(" - ")
         m=re.search(r"\s\(feat\.[^\()]+\)",file_name)
         if m.start()>idx:
@@ -50,10 +49,10 @@ def clean_file_name(file_name):
             file_name=re.sub(r"\s\(feat\.[^\()]+\)","",file_name)
             file_name=file_name[:idx]+feat_str+file_name[idx:]
     file_name=re.sub(";",",",file_name)
-    # - remains in the end
-    file_name=re.sub(r"\s\-\s+\Z","",file_name)
-    # Easy fix
     file_name=re.sub("Dj","DJ",file_name)
+    file_name=re.sub(r"[0-9][A-Z]\s-\s[0-9]*\s-\s","",file_name) # Key,BPM
+    file_name=re.sub(r"\s-\s[0-9][A-Z]\s-\s[0-9]*","",file_name) # Key,BPM
+    file_name=re.sub(r"\s\-\s+\Z","",file_name) # - remains in the end
     return file_name
 
 # TODO: look at version, audio length...
@@ -65,20 +64,25 @@ def find_duplicates(file_names):
         title1,ext1=os.path.splitext(file_name1)
         if ext0!=ext1:
             continue
-        else:
+        else: # TODO: What if there is no - in the name?
             title_chunks0=title0.split(" - ")
             title_chunks1=title1.split(" - ")
+            artist0=title_chunks0[0]
+            rest0=title_chunks0[1]
+            artist1=title_chunks1[0]
+            rest1=title_chunks0[1]
             # Compare artists
-            if title_chunks0[0]!=title_chunks1[0]:
+            if artist0!=artist1:
                 continue
             else:
                 # Compare the first words of the rest
-                word0=title_chunks0[1].split(" ")[0]
-                word1=title_chunks1[1].split(" ")[0]
+                word0=rest0.split(" ")[0]
+                word1=rest1.split(" ")[0]
                 if word0!=word1:
                     continue
                 else:
-                    print("Same files!")
+
+                    print("Same files found:")
                     print(title0+ext0)
                     print(title1+ext1)
                     print()
