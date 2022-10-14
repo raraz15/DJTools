@@ -34,6 +34,25 @@ def check_bandwidth(y,nfft,L,sr,qt,thresh=-110):
     else:
         return S_db,0
 
+def algo2(y,nfft,L,sr,qt,thresh=-110):
+    # Calculate the spectrogram
+    S=np.abs(librosa.stft(y,n_fft=nfft,hop_length=L))
+    S_db=librosa.amplitude_to_db(S,ref=np.max,top_db=-thresh)
+    F,T=S_db.shape
+    F_start=4*F//5
+    F_start=3*F//4
+    found=False
+    for f in range(F_start,F)[::-1]:
+        p=100*len(np.where(S_db[f,:]>thresh)[0])/len(S_db[f,:])
+        if p>=55:
+            found=True
+            break
+    if found:
+        return S_db, int((f/F)*(sr/2))
+    else:
+        return S_db, 0
+
+# TODO: plot the actual time
 def plot_spectrogram(spec,nfft,L,sr,title,save_dir=""):
     fig,ax=plt.subplots(figsize=(12,8))
     ax.set_title(title,fontsize=20)
@@ -51,7 +70,9 @@ def plot_spectrogram(spec,nfft,L,sr,title,save_dir=""):
         os.makedirs(save_dir,exist_ok=True)
         save_path=os.path.join(save_dir,os.path.splitext(title)[0]+".jpeg")
         fig.savefig(save_path)
-    plt.close()
+        plt.close()
+    else:
+        plt.show()
 
 # TODO: Check clipping
 if __name__=="__main__":
@@ -67,10 +88,14 @@ if __name__=="__main__":
     thresh=-110
     T=240 # seconds
 
-    success_dir=os.path.join(args.output,"success")
-    fail_dir=os.path.join(args.output,"fail")
-    os.makedirs(success_dir,exist_ok=True)
-    os.makedirs(fail_dir,exist_ok=True)
+    if args.output:
+        success_dir=os.path.join(args.output,"success")
+        fail_dir=os.path.join(args.output,"fail")
+        os.makedirs(success_dir,exist_ok=True)
+        os.makedirs(fail_dir,exist_ok=True)
+    else:
+        success_dir=""
+        fail_dir=""
 
     file_paths=sorted([path for path in glob(f"{args.path}/*.mp3")])
     total_time=0
@@ -83,7 +108,6 @@ if __name__=="__main__":
             n=np.random.randint(0,len(y)-T*sr)
             y=y[n:n+T*sr] # Shorten the audio signal
         spec,bandwidth=check_bandwidth(y,nfft,L,sr,qt,thresh=thresh)
-        #print(np.mean(spec,axis=1))
         print(f"Detected bandwidth: {bandwidth:.1f}Hz")
         if bandwidth<19500:
             title=os.path.basename(file_path)
@@ -94,4 +118,4 @@ if __name__=="__main__":
         end_time=time.time()
         total_time+=end_time-start_time
         print(f"{end_time-start_time:.4f} seconds file")
-print(f"{total_time:.2f} seconds total processing")
+    print(f"{total_time:.2f} seconds total processing")
