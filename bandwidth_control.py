@@ -70,9 +70,16 @@ def plot_spectrogram(spec,nfft,L,sr,title,save_dir=""):
         os.makedirs(save_dir,exist_ok=True)
         save_path=os.path.join(save_dir,os.path.splitext(title)[0]+".jpeg")
         fig.savefig(save_path)
-        plt.close()
+        plt.clf()
+        plt.close(fig)
     else:
         plt.show()
+
+nfft=4096
+L=nfft//2
+qt=5
+thresh=-110
+T=240 # seconds
 
 # TODO: Check clipping
 if __name__=="__main__":
@@ -81,12 +88,6 @@ if __name__=="__main__":
     parser.add_argument("-p","--path",type=str,required=True,help="Path to directory containing audio files.")
     parser.add_argument("-o","--output",type=str,required=True,help="Directory for saving the sptectrograms.")
     args=parser.parse_args()
-
-    nfft=4096
-    L=nfft//2
-    qt=5
-    thresh=-110
-    T=240 # seconds
 
     if args.output:
         success_dir=os.path.join(args.output,"success")
@@ -118,4 +119,5 @@ if __name__=="__main__":
         end_time=time.time()
         total_time+=end_time-start_time
         print(f"{end_time-start_time:.4f} seconds file")
+        print("="*60)
     print(f"{total_time:.2f} seconds total processing")
