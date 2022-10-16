@@ -60,60 +60,6 @@ def clean_file_name(file_name):
     file_name=re.sub(r"\s\-\s+\Z","",file_name) # - 
     return file_name
 
-# TODO: look at version, audio length...
-def find_duplicates(file_names):
-    for i in range(len(file_names)-1):
-        file_name0=file_names[i]
-        file_name1=file_names[i+1]
-        title0,ext0=os.path.splitext(file_name0)
-        title1,ext1=os.path.splitext(file_name1)
-        if ext0!=ext1:
-            continue
-        else: # TODO: What if there is no - in the name?
-            title_chunks0=title0.split(" - ")
-            title_chunks1=title1.split(" - ")
-            artist0=title_chunks0[0]
-            rest0=title_chunks0[1]
-            artist1=title_chunks1[0]
-            rest1=title_chunks0[1]
-            # Compare artists
-            if artist0!=artist1:
-                continue
-            else:
-                # Compare the first words of the rest
-                word0=rest0.split(" ")[0]
-                word1=rest1.split(" ")[0]
-                if word0!=word1:
-                    continue
-                else:
-
-                    print("Same files found:")
-                    print(title0+ext0)
-                    print(title1+ext1)
-                    print()
-                    ## This is where it gets dangerous, some titles dont have version info
-                    ## Compare the titles except the version
-                    #title_mix_chunk0=title_chunks0[1].split(" (")
-                    #title_mix_chunk1=title_chunks1[1].split(" (")
-                    #if title_mix_chunk0[0]!=title_mix_chunk1[0]:
-                    #    continue
-                    #else:
-                    #    # Compare the mix types
-                    #    if len(title_mix_chunk0)>1 and len(title_mix_chunk1) >1:
-                    #        if ")" in title_mix_chunk0[1] and ")" in title_mix_chunk1[1]:
-                    #            mix0=title_mix_chunk0[1].split(")")[0]
-                    #            mix1=title_mix_chunk1[1].split(")")[0]
-                    #            #print(mix0,mix1)
-                    #            if mix0!=mix1:
-                    #                continue
-                    #            else:
-                    #                print("Same files!")
-                    #                print(title0+ext0)
-                    #                print(title1+ext1)
-                    #                print()
-                    #    else:
-                    #        continue
-
 if __name__=="__main__":
 
     parser=argparse.ArgumentParser()

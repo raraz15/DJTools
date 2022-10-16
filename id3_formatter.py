@@ -9,7 +9,7 @@ from shutil import move
 from mutagen import File
 from mutagen.id3 import ID3,APIC,TDRL,TPE1,TIT2,TCON,TPUB
 
-from file_name_organizer import clean_file_name,find_duplicates
+from file_name_organizer import clean_file_name
 
 sys.path.append("/Users/recep_oguz_araz/Projects/electronic_music_downloader")
 
@@ -112,7 +112,6 @@ def find_missing_tags(file_path):
         audio.save(v2_version=3)
         print("Saved the tags!")
 
-# TODO: find duplicates after
 # TODO: during beatport search if track has tags, use them
 if __name__=="__main__":
 
@@ -157,10 +156,4 @@ if __name__=="__main__":
                 find_missing_tags(file_path)
     except KeyboardInterrupt:
         sys.exit()
-    ## Search for duplicates
-    #file_paths=[]
-    #for ext in EXT:
-    #    file_paths+=[path for path in glob(f"{args.path}/*{ext}")]
-    #file_paths=sorted(file_paths)
-    #find_duplicates(file_paths)
     print("Done!")
