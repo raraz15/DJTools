@@ -7,6 +7,7 @@ from shutil import move
 EXT=[".mp3",".flac",".wav"]
 
 # TODO: , with ,\s
+# TODO: (with Artist) should come at the beginning
 def clean_file_name(file_name):
     """Expects the file name without the extension."""
 
@@ -21,10 +22,11 @@ def clean_file_name(file_name):
     m=re.search(r"\[.*[M|m]ix\]",file_name) # Replace [] with () around the Mix
     if m:
         file_name=file_name[:m.start()]+f"({m[0][1:-1]})"+file_name[m.end():]
-    m=re.search(r"\([^\)]*[M|m]ix\)",file_name)
-    if m: # Capitalize Mix type
+    m=re.search(r"\([^\)]*[M|m]ix\)",file_name) # Capitalize Mix type
+    if m:
         file_name=file_name[:m.start()]+f"{m[0]}".title()+file_name[m.end():]
-    file_name=re.sub(r"www\..*\.[com|net]","",file_name)
+    file_name=re.sub(r"www\..*\.[com|net]","",file_name) # Remove urls
+
     # Deal with feat
     file_name=re.sub(r"Feat|Ft|ft",r"feat",file_name)
     m=re.search(r"feat",file_name)
@@ -32,7 +34,10 @@ def clean_file_name(file_name):
         file_name=file_name[:m.start()]+"feat. "+file_name[m.end():]
     m=re.search(r"feat\. ",file_name) # Enclose remixer name in parantheses
     if m and file_name[m.start()-1]!="(":
-        feat_remixer="feat. "+" ".join(file_name[m.end():].split(" ")[:2])
+        feat_remixer=file_name[m.end():].split(" ")[:2] # Take the next 2 words
+        if "(" in feat_remixer[-1]: # If the artist has a single word name
+            feat_remixer.pop(-1)
+        feat_remixer="feat. "+" ".join(feat_remixer)
         file_name=re.sub(feat_remixer,f"({feat_remixer})",file_name)
     if "feat. " in file_name:
         # Remove the feat artist from the Producers part
@@ -50,9 +55,9 @@ def clean_file_name(file_name):
             file_name=file_name[:idx]+feat_str+file_name[idx:]
     file_name=re.sub(";",",",file_name)
     file_name=re.sub("Dj","DJ",file_name)
-    file_name=re.sub(r"[0-9][A-Z]\s-\s[0-9]*\s-\s","",file_name) # Key,BPM
-    file_name=re.sub(r"\s-\s[0-9][A-Z]\s-\s[0-9]*","",file_name) # Key,BPM
-    file_name=re.sub(r"\s\-\s+\Z","",file_name) # - remains in the end
+    file_name=re.sub(r"[0-9][A-Z]\s-\s[0-9]{2,4}\s-\s","",file_name) # Key,BPM
+    file_name=re.sub(r"\s-\s[0-9][A-Z]\s-\s[0-9]{2,4}","",file_name) # Key,BPM
+    file_name=re.sub(r"\s\-\s+\Z","",file_name) # - 
     return file_name
 
 # TODO: look at version, audio length...
