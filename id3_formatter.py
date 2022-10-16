@@ -148,14 +148,13 @@ if __name__=="__main__":
             # Load the ID3 tags
             if ext==".flac" or ext==".wav":
                 print(".flac or .wav, file not messing with the tags.")
-                continue
             else:
                 first_load(file_path)
-            print(f"Cleaning the existing tags...")
-            # Clean the tags
-            clean_tags(file_path)
-            # Fill missing information
-            find_missing_tags(file_path)
+                print(f"Cleaning the existing tags...")
+                # Clean the tags
+                clean_tags(file_path)
+                # Fill missing information
+                find_missing_tags(file_path)
     except KeyboardInterrupt:
         sys.exit()
     ## Search for duplicates
