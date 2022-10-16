@@ -22,10 +22,10 @@ if __name__=="__main__":
         try:
             sr=librosa.get_samplerate(file_path)
             y,_=librosa.load(file_path,sr=sr)
-        except Warning:
-            print("Byte Error!")
+            print(f"{len(y)} samples returned.")
+        except: #Warning
+            print("Unkown Error!")
         end_time=time.time()
         total_time+=end_time-start_time
-        print()
-        #print(f"{end_time-start_time:.4f} seconds file")
+        print("="*100)
     print(f"{total_time:.2f} seconds total processing")
