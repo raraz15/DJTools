@@ -6,6 +6,36 @@ import argparse
 
 EXT=[".mp3",".flac",".wav"]
 
+def parse_track_title(title):
+    """Provide without file extension"""
+
+    if " - " in title:
+        m=re.search(r"\(.*-.*\)",title) # When the version has a - in it
+        if m:
+            idx=title.index(" - ")
+            artist=title[:idx]
+            rest=title[idx:]
+        else:
+            artist,rest=title.split(" - ")
+    else:
+        artist=""
+        rest=title
+
+    m=re.search(r"\([^\)]*[M|m]ix\)",rest)
+    if m:
+        version=m.group()
+        name=rest[:m.start()-1]
+    else: # It should be the "feat" or "with"
+        version=""
+        name=rest
+
+    m=re.search(r"\[.*\]",title)
+    if m:
+        label=m.group()
+    else:
+        label=""
+    return artist,name,version,label
+
 # TODO: look at version, audio length...
 def find_duplicates(file_names):
     for i in range(len(file_names)-1):
@@ -13,61 +43,30 @@ def find_duplicates(file_names):
         file_name1=file_names[i+1]
         title0,ext0=os.path.splitext(file_name0)
         title1,ext1=os.path.splitext(file_name1)
-
-        if " - " in title0:
-            title_chunks0=title0.split(" - ")
-            artist0=title_chunks0[0]
-            if len(title_chunks0)==2:
-                rest0=title_chunks0[1]
-            else:
-                rest0=""
-        else:
-            artist0=""
-            rest0=title_chunks0
-        if " - " in title1:
-            title_chunks1=title1.split(" - ")
-            artist1=title_chunks1[0]
-            if len(title_chunks1)==2:
-                rest1=title_chunks1[1]
-            else:
-                rest1=""
-        else:
-            artist1=""
-            rest1=title_chunks1
-
-        if "(" in rest0:
-            m=re.search(r"\([^\)]*[M|m]ix\)",rest0)
-            if m:
-                version0=m.group()
-                name0=rest0[:m.start()-1]
-            else:
-                version0=""
-                name0=rest0
-        else:
-            name0=rest0
-            version0=""
-        if "(" in rest1:
-            m=re.search(r"\([^\)]*[M|m]ix\)",rest1)
-            if m:
-                version1=m.group()
-                name1=rest1[:m.start()-1]
-            else:
-                version1=""
-                name1=rest1
-        else:
-            name1=rest1
-            version1=""
-
-        if name1!=name0:
+        artist0,name0,version0,label0=parse_track_title(title0)
+        artist1,name1,version1,label1=parse_track_title(title1)
+        if name0!=name1:
             continue
         else:
             if artist0!=artist1:
                 continue
             else:
-                print("Same files found:")
-                print(file_name0)
-                print(file_name1)
-                print()
+                if version0==version1:
+                    if ext0==ext1:
+                        print("Same files found:")
+                        print(file_name0)
+                        print(file_name1)
+                        print()
+                    else:
+                        print("Same files with different extension found:")
+                        print(file_name0)
+                        print(file_name1)
+                        print()
+                else:
+                    print("Same track with different versions found.")
+                    print(file_name0)
+                    print(file_name1)
+                    print()
 
 if __name__=="__main__":
 
@@ -76,8 +75,9 @@ if __name__=="__main__":
     args=parser.parse_args()
 
     # Search for duplicates
-    file_paths=[]
+    file_names=[]
     for ext in EXT:
-        file_paths+=[os.path.basename(path) for path in glob(f"{args.path}/*{ext}")]
-    file_paths=sorted(file_paths)
-    find_duplicates(file_paths)
+        file_names+=[os.path.basename(path) for path in glob(f"{args.path}/*{ext}")]
+    file_names=sorted(file_names)
+    
+    find_duplicates(file_names)
