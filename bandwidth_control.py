@@ -1,7 +1,8 @@
 import os
-from glob import glob
 import time
 import argparse
+from glob import glob
+import datetime as dt
 import scipy
 import numpy as np
 
@@ -9,6 +10,8 @@ import matplotlib.pyplot as plt
 
 import librosa
 import librosa.display
+
+DATE=dt.datetime.strftime(dt.datetime.now(),"%d_%m_%Y")
 
 def check_bandwidth(y,nfft,L,sr,qt,thresh=-110):
     # Calculate the spectrogram
@@ -72,8 +75,6 @@ def plot_spectrogram(spec,nfft,L,sr,title,save_dir=""):
         fig.savefig(save_path)
         plt.clf()
         plt.close(fig)
-    else:
-        plt.show()
 
 nfft=4096
 L=nfft//2
@@ -86,17 +87,13 @@ if __name__=="__main__":
 
     parser=argparse.ArgumentParser()
     parser.add_argument("-p","--path",type=str,required=True,help="Path to directory containing audio files.")
-    parser.add_argument("-o","--output",type=str,required=True,help="Directory for saving the sptectrograms.")
+    parser.add_argument("-o","--output",type=str,default=DATE,help="Directory for saving the sptectrograms.")
     args=parser.parse_args()
 
-    if args.output:
-        success_dir=os.path.join(args.output,"success")
-        fail_dir=os.path.join(args.output,"fail")
-        os.makedirs(success_dir,exist_ok=True)
-        os.makedirs(fail_dir,exist_ok=True)
-    else:
-        success_dir=""
-        fail_dir=""
+    success_dir=os.path.join(args.output,"success")
+    fail_dir=os.path.join(args.output,"fail")
+    os.makedirs(success_dir,exist_ok=True)
+    os.makedirs(fail_dir,exist_ok=True)
 
     file_paths=sorted([path for path in glob(f"{args.path}/*.mp3")])
     total_time=0
