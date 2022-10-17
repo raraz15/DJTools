@@ -26,6 +26,7 @@ def clean_file_name(file_name):
     if m:
         file_name=file_name[:m.start()]+f"{m[0]}".title()+file_name[m.end():]
     file_name=re.sub(r"www\..*\.[com|net]","",file_name) # Remove urls
+    file_name=re.sub(r"\s-\s*main\s[0-9]{3}","",file_name)
 
     # Deal with feat
     file_name=re.sub(r"Feat|Ft|ft",r"feat",file_name)
