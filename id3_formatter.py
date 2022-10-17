@@ -149,11 +149,12 @@ if __name__=="__main__":
                 print(".flac or .wav, file not messing with the tags.")
             else:
                 first_load(file_path)
-                print(f"Cleaning the existing tags...")
+                print(f"Cleaning the unnecessary tags...")
                 # Clean the tags
                 clean_tags(file_path)
                 # Fill missing information
                 find_missing_tags(file_path)
     except KeyboardInterrupt:
         sys.exit()
+    print("="*80)
     print("Done!")
