@@ -6,13 +6,13 @@ from shutil import move
 
 EXT=[".mp3",".flac",".wav"]
 
-# TODO: , with ,\s
+# TODO: #Initial key, bpm cleanng does not work
+# TODO: Better Version Capitalize
 # TODO: (with Artist) should come at the beginning
 def clean_file_name(file_name):
     """Expects the file name without the extension."""
 
-    if " " not in file_name:
-        # if_the_file-name_is_like_this
+    if " " not in file_name: # if_the_file-name_is_like_this
         file_name=re.sub("_"," ",file_name)
         file_name=re.sub("-"," - ",file_name)
         file_name=file_name.title()
