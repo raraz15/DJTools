@@ -37,6 +37,7 @@ def parse_track_title(title):
     return artist,name,version,label
 
 # TODO: look at version, audio length...
+# TODO: 3 name artists
 def find_duplicates(file_names):
     for i in range(len(file_names)-1):
         file_name0=file_names[i]
