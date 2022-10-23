@@ -82,6 +82,11 @@ def insert_artwork(file_path):
             else:
                 print("Image couldn't be downloaded.")
 
+def flac_comment_formatter(file_path):
+    clean_tags(file_path)
+    format_title_artist(file_path)
+    insert_artwork(file_path)
+
 if __name__=="__main__":
 
     parser=argparse.ArgumentParser()
@@ -105,9 +110,6 @@ if __name__=="__main__":
                 move(file_path,clean_file_path)
                 file_path=clean_file_path
         print(f"Input name:\n{file_name}")
-        # Tag formatting
-        clean_tags(file_path)
-        format_title_artist(file_path)
-        insert_artwork(file_path)
+        flac_comment_formatter(file_path)
     print("="*80)
     print("Done!")

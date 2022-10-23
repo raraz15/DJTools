@@ -111,6 +111,15 @@ def find_missing_tags(file_path):
         audio.save(v2_version=3)
         print("Saved the tags!")
 
+def id3_tag_formatter(file_path):
+    # Load the ID3 tags
+    first_load(file_path)
+    print(f"Cleaning the unnecessary tags...")
+    # Clean the tags
+    clean_tags(file_path)
+    # Fill missing information
+    find_missing_tags(file_path)
+
 # TODO: during beatport search if track has tags, use them
 if __name__=="__main__":
 
@@ -140,13 +149,7 @@ if __name__=="__main__":
                     print(f"Changing the name to:\n{clean_name+ext}")
                     move(file_path,clean_file_path)
                     file_path=clean_file_path
-            # Load the ID3 tags
-            first_load(file_path)
-            print(f"Cleaning the unnecessary tags...")
-            # Clean the tags
-            clean_tags(file_path)
-            # Fill missing information
-            find_missing_tags(file_path)
+            id3_tag_formatter(file_path)
     except KeyboardInterrupt:
         sys.exit()
     print("="*80)
