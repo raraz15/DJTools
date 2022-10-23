@@ -22,7 +22,7 @@ KEYS=["APIC", # Image
     "TIT2",   # Title
     "TCON",   # Genre
     "TPUB"]   # Publisher
-EXT=[".mp3",".wav"]
+EXT=[".mp3"] # ,".wav" 
 
 def first_load(file_path):
     try:
@@ -121,6 +121,7 @@ def id3_tag_formatter(file_path):
     # Fill missing information
     find_missing_tags(file_path)
 
+# TODO: wav support!
 # TODO: during beatport search if track has tags, use them
 if __name__=="__main__":
 
