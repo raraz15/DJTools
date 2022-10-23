@@ -33,7 +33,7 @@ def clean_file_name(file_name):
     m=re.search(r"feat",file_name)
     if m and file_name[m.end():m.end()+2]!=". ":
         file_name=file_name[:m.start()]+"feat. "+file_name[m.end():]
-    m=re.search(r"feat\. ",file_name) # Enclose remixer name in parantheses
+    m=re.search(r"feat\. ",file_name) # Enclose feat name in parantheses
     if m and file_name[m.start()-1]!="(":
         feat_remixer=file_name[m.end():].split(" ")[:2] # Take the next 2 words
         if "(" in feat_remixer[-1]: # If the artist has a single word name
@@ -52,8 +52,9 @@ def clean_file_name(file_name):
         m=re.search(r"\s\(feat\.[^\()]+\)",file_name)
         if m.start()>idx:
             feat_str=m.group()
-            file_name=re.sub(r"\s\(feat\.[^\()]+\)","",file_name)
+            file_name=re.sub(r"\s\(feat\.[^\()]+\)","",file_name) # IS this a bug?
             file_name=file_name[:idx]+feat_str+file_name[idx:]
+
     file_name=re.sub(";",",",file_name)
     file_name=re.sub("Dj","DJ",file_name)
     file_name=re.sub(r"[0-9][A-Z]\s-\s[0-9]{2,4}\s-\s","",file_name) # Key,BPM
