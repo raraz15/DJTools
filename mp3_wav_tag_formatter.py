@@ -22,6 +22,7 @@ KEYS=["APIC", # Image
     "TIT2",   # Title
     "TCON",   # Genre
     "TPUB"]   # Publisher
+EXT=[".mp3",".wav"]
 
 def first_load(file_path):
     try:
@@ -129,7 +130,10 @@ if __name__=="__main__":
     args=parser.parse_args()
 
     # Find the audio file paths
-    file_paths=sorted(glob(f"{args.path}/*.mp3"))
+    file_paths=[]
+    for ext in EXT:
+        file_paths+=glob(f"{args.path}/*{ext}")
+    file_paths=sorted(file_paths)
     print(f"{len(file_paths)} tracks found in:\n{args.path}")
 
     print("Starting the tag formatting...")

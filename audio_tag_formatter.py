@@ -21,7 +21,7 @@ if __name__=="__main__":
     # Find the audio file paths
     file_paths=[]
     for ext in EXT:
-        file_paths+=[path for path in glob(f"{args.path}/*{ext}")]
+        file_paths+=glob(f"{args.path}/*{ext}")
     file_paths=sorted(file_paths)
     print(f"{len(file_paths)} tracks found in:\n{args.path}")
 
