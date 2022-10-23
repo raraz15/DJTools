@@ -22,7 +22,6 @@ KEYS=["APIC", # Image
     "TIT2",   # Title
     "TCON",   # Genre
     "TPUB"]   # Publisher
-EXT=[".mp3",".flac",".wav"]
 
 def first_load(file_path):
     try:
@@ -121,10 +120,7 @@ if __name__=="__main__":
     args=parser.parse_args()
 
     # Find the audio file paths
-    file_paths=[]
-    for ext in EXT:
-        file_paths+=[path for path in glob(f"{args.path}/*{ext}")]
-    file_paths=sorted(file_paths)
+    file_paths=sorted(glob(f"{args.path}/*.mp3"))
     print(f"{len(file_paths)} tracks found in:\n{args.path}")
 
     print("Starting the tag formatting...")
@@ -145,15 +141,12 @@ if __name__=="__main__":
                     move(file_path,clean_file_path)
                     file_path=clean_file_path
             # Load the ID3 tags
-            if ext==".flac" or ext==".wav":
-                print(".flac or .wav, file not messing with the tags.")
-            else:
-                first_load(file_path)
-                print(f"Cleaning the unnecessary tags...")
-                # Clean the tags
-                clean_tags(file_path)
-                # Fill missing information
-                find_missing_tags(file_path)
+            first_load(file_path)
+            print(f"Cleaning the unnecessary tags...")
+            # Clean the tags
+            clean_tags(file_path)
+            # Fill missing information
+            find_missing_tags(file_path)
     except KeyboardInterrupt:
         sys.exit()
     print("="*80)
