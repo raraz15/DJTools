@@ -10,6 +10,7 @@ from mp3_wav_tag_formatter import id3_tag_formatter
 
 EXT=[".mp3",".flac",".wav"]
 
+# TODO: cleaning, moving function
 if __name__=="__main__":
 
     parser=argparse.ArgumentParser()

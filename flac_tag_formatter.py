@@ -87,6 +87,7 @@ def flac_comment_formatter(file_path):
     format_title_artist(file_path)
     insert_artwork(file_path)
 
+# TODO: cleaning, moving function
 if __name__=="__main__":
 
     parser=argparse.ArgumentParser()
@@ -99,6 +100,7 @@ if __name__=="__main__":
         print("="*80)
         print(f"{i+1}/{len(file_paths)}")
         file_name=os.path.basename(file_path)
+        print(f"Input name:\n{file_name}")
         file_name,ext=os.path.splitext(file_name)
         # File name cleaning
         clean_name=clean_file_name(file_name) # Required for beatport search
@@ -109,7 +111,6 @@ if __name__=="__main__":
                 print(f"Changing the name to:\n{clean_name+ext}")
                 move(file_path,clean_file_path)
                 file_path=clean_file_path
-        print(f"Input name:\n{file_name}")
         flac_comment_formatter(file_path)
     print("="*80)
     print("Done!")

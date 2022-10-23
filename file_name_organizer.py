@@ -62,6 +62,7 @@ def clean_file_name(file_name):
     file_name=re.sub(r"\s\-\s+\Z","",file_name) # - 
     return file_name
 
+# TODO: cleaning, moving function
 if __name__=="__main__":
 
     parser=argparse.ArgumentParser()
