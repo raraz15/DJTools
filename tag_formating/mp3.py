@@ -5,7 +5,7 @@ import requests
 from mutagen import File
 from mutagen.id3 import ID3,APIC,TDRL,TPE1,TIT2,TCON,TPUB
 
-from utilities.file_name_organizer import clean_file_name
+from utils.file_name_organizer import clean_file_name
 
 sys.path.append("/Users/recep_oguz_araz/Projects/electronic_music_downloader")
 
@@ -18,7 +18,6 @@ KEYS=["APIC", # Image
     "TIT2",   # Title
     "TCON",   # Genre
     "TPUB"]   # Publisher
-EXT=[".mp3"] # ,".wav" 
 
 def first_load(file_path):
     try:
@@ -82,7 +81,7 @@ def find_missing_tags(file_path):
             print("Beatport search failed.")
         else:
             track_dict=scrape_track(beatport_url)
-            # Fill each tag if missing
+            # Fill desired tag if missing
             for key in KEYS:
                 if key not in list(audio.keys()):
                     if key=="TPE1":
@@ -107,15 +106,12 @@ def find_missing_tags(file_path):
                         audio["APIC"]=APIC(3,'image/jpg',3,'Front cover',req.content)
                     else:
                         continue
-    # Save the tags
+        # Save the tags
         audio.save(v2_version=3)
         print("Saved the tags!")
 
-def id3_tag_formatter(file_path):
-    # Load the ID3 tags
-    first_load(file_path)
+def mp3_tag_formatter(file_path):
+    first_load(file_path) # Load the ID3 tags
     print(f"Cleaning the unnecessary tags...")
-    # Clean the tags
-    clean_tags(file_path)
-    # Fill missing information
-    find_missing_tags(file_path)
+    clean_tags(file_path) # Clean the tags
+    find_missing_tags(file_path) # Fill missing information

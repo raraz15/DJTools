@@ -4,9 +4,8 @@ from glob import glob
 import argparse
 from shutil import move
 
-from utilities.file_name_organizer import clean_file_name
-from tag_formating.flac import flac_comment_formatter
-from tag_formating.mp3_wav import id3_tag_formatter
+from utils.file_name_organizer import clean_file_name
+from tag_formating import mp3_tag_formatter,flac_tag_formatter,wav_tag_formatter
 
 EXT=[".mp3",".flac",".wav"]
 
@@ -42,10 +41,12 @@ if __name__=="__main__":
                     print(f"Changing the name to:\n{clean_name+ext}")
                     move(file_path,clean_file_path)
                     file_path=clean_file_path
-            if ext==".mp3" or ext==".wav":
-                id3_tag_formatter(file_path)
+            if ext==".mp3":
+                mp3_tag_formatter(file_path)
+            if ext==".wav":
+                wav_tag_formatter(file_path)
             elif ext==".flac":
-                flac_comment_formatter(file_path)
+                flac_tag_formatter(file_path)
             else:
                 print("Unsupported file type!")
     except KeyboardInterrupt:

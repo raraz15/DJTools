@@ -76,7 +76,7 @@ def insert_artwork(file_path):
             else:
                 print("Image couldn't be downloaded.")
 
-def flac_comment_formatter(file_path):
+def comment_formatter(file_path):
     clean_tags(file_path)
     format_title_artist(file_path)
     insert_artwork(file_path)
