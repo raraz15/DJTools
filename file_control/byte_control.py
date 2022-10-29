@@ -4,9 +4,6 @@ from glob import glob
 import time
 import argparse
 
-import warnings
-#warnings.filterwarnings("error")
-
 import librosa
 
 if __name__=="__main__":

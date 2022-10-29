@@ -1,6 +1,5 @@
 import os
 import re
-import requests
 from glob import glob
 import argparse
 
@@ -80,14 +79,5 @@ if __name__=="__main__":
     for ext in EXT:
         file_names+=[os.path.basename(path) for path in glob(f"{args.path}/*{ext}")]
     file_names=sorted(file_names)
-    
-    #for file_name in file_names:
-    #    title,ext=os.path.splitext(file_name)
-    #    artist,name,version,label=parse_track_title(title)
-    #    print(f"artist: {artist}")
-    #    print(f"name: {name}")
-    #    print(f"version: {version}")
-    #    print(f"label: {label}")
-    #    print()
-    
+
     find_duplicates(file_names)
