@@ -22,10 +22,12 @@ KEYS=["APIC", # Image
 # TODO: simplify?
 def clean_tags(file_path):
     audio=WAVE(file_path)
+    print("Removing unnecessary tags...")
     # Remove unnecessary keys directly
     for key in list(audio.keys()):
         if key not in KEYS:
             audio.pop(key)
+    print(f"Cleaning the texts of the tags...")
     # Clean and format the tags
     for key in list(audio.keys()):
         # Only check non-image and non-time-stamp keys
@@ -67,10 +69,10 @@ def find_missing_tags(file_path):
         clean_name=clean_file_name(file_name)
         # Scrape Information from beatport
         beatport_url=make_beatport_query(clean_name)
-        print(f"Beatport URL: {beatport_url}")
         if not beatport_url:
             print("Beatport search failed.")
         else:
+            print(f"Beatport URL: {beatport_url}")
             track_dict=scrape_track(beatport_url)
             # Fill desired tags if missing
             for key in KEYS:
@@ -102,6 +104,5 @@ def find_missing_tags(file_path):
         print("Saved the tags!")
 
 def wav_tag_formatter(file_path):
-    print(f"Cleaning the unnecessary tags...")
     clean_tags(file_path) # Clean the tags
     find_missing_tags(file_path) # Fill missing information

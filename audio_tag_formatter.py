@@ -30,7 +30,7 @@ if __name__=="__main__":
             print("="*80)
             print(f"{i+1}/{len(file_paths)}")
             file_name=os.path.basename(file_path)
-            print(f"Input name:\n{file_name}")
+            print(f"Input:\n{file_name}")
             file_name,ext=os.path.splitext(file_name)
             # File name cleaning
             clean_name=clean_file_name(file_name) # Required for beatport search
