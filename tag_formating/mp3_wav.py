@@ -1,15 +1,11 @@
-import os
-import sys
+import os,sys
 import re
 import requests
-from glob import glob
-import argparse
-from shutil import move
 
 from mutagen import File
 from mutagen.id3 import ID3,APIC,TDRL,TPE1,TIT2,TCON,TPUB
 
-from file_name_organizer import clean_file_name
+from utilities.file_name_organizer import clean_file_name
 
 sys.path.append("/Users/recep_oguz_araz/Projects/electronic_music_downloader")
 
@@ -33,6 +29,7 @@ def first_load(file_path):
         audio.add_tags()
         audio.save(v2_version=3)
 
+# TODO: simplify?
 def clean_tags(file_path):
     audio=ID3(file_path)
     # Remove unnecessary keys directly
@@ -76,6 +73,8 @@ def find_missing_tags(file_path):
     # If a tag is missing search for it in Beatport
     if failed:
         print("Some of the tags are missing. Making a Beatport query....")
+        file_name=os.path.splitext(os.path.basename(file_path))[0]
+        clean_name=clean_file_name(file_name)
         # Scrape Information from beatport
         beatport_url=make_beatport_query(clean_name)
         print(f"Beatport URL: {beatport_url}")
@@ -120,42 +119,3 @@ def id3_tag_formatter(file_path):
     clean_tags(file_path)
     # Fill missing information
     find_missing_tags(file_path)
-
-# TODO: wav support!
-# TODO: during beatport search if track has tags, use them
-if __name__=="__main__":
-
-    parser=argparse.ArgumentParser()
-    parser.add_argument("-p","--path",type=str,required=True,help="Path to directory containing audio files.")
-    parser.add_argument("-c","--clean",action="store_true",help="Clean the name of the audio files.")
-    args=parser.parse_args()
-
-    # Find the audio file paths
-    file_paths=[]
-    for ext in EXT:
-        file_paths+=glob(f"{args.path}/*{ext}")
-    file_paths=sorted(file_paths)
-    print(f"{len(file_paths)} tracks found in:\n{args.path}")
-
-    print("Starting the tag formatting...")
-    try:
-        for i,file_path in enumerate(file_paths):
-            print("="*80)
-            print(f"{i+1}/{len(file_paths)}")
-            file_name=os.path.basename(file_path)
-            print(f"Input name:\n{file_name}")
-            file_name,ext=os.path.splitext(file_name)
-            # File name cleaning
-            clean_name=clean_file_name(file_name) # Required for beatport search
-            if args.clean:
-                dir_path=os.path.dirname(file_path)
-                clean_file_path=os.path.join(dir_path,clean_name+ext)
-                if file_name!=clean_name: # Change file name if cleaning changes it
-                    print(f"Changing the name to:\n{clean_name+ext}")
-                    move(file_path,clean_file_path)
-                    file_path=clean_file_path
-            id3_tag_formatter(file_path)
-    except KeyboardInterrupt:
-        sys.exit()
-    print("="*80)
-    print("Done!")

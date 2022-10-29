@@ -4,9 +4,9 @@ from glob import glob
 import argparse
 from shutil import move
 
-from file_name_organizer import clean_file_name
-from flac_tag_formatter import flac_comment_formatter
-from mp3_wav_tag_formatter import id3_tag_formatter
+from utilities.file_name_organizer import clean_file_name
+from tag_formating.flac import flac_comment_formatter
+from tag_formating.mp3_wav import id3_tag_formatter
 
 EXT=[".mp3",".flac",".wav"]
 

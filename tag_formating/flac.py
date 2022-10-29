@@ -1,13 +1,7 @@
-import os
 import sys
 import re
 import json
-import argparse
 import requests
-from shutil import move
-from glob import glob
-
-from file_name_organizer import clean_file_name
 
 from mutagen.flac import FLAC,Picture
 
@@ -86,31 +80,3 @@ def flac_comment_formatter(file_path):
     clean_tags(file_path)
     format_title_artist(file_path)
     insert_artwork(file_path)
-
-# TODO: cleaning, moving function
-if __name__=="__main__":
-
-    parser=argparse.ArgumentParser()
-    parser.add_argument("-p","--path",type=str,required=True,help="Path to directory containing audio files.")
-    parser.add_argument("-c","--clean",action="store_true",help="Clean the name of the audio files.")
-    args=parser.parse_args()
-
-    file_paths=sorted(glob(f"{args.path}/*.flac"))
-    for i,file_path in enumerate(file_paths):
-        print("="*80)
-        print(f"{i+1}/{len(file_paths)}")
-        file_name=os.path.basename(file_path)
-        print(f"Input name:\n{file_name}")
-        file_name,ext=os.path.splitext(file_name)
-        # File name cleaning
-        clean_name=clean_file_name(file_name) # Required for beatport search
-        if args.clean:
-            dir_path=os.path.dirname(file_path)
-            clean_file_path=os.path.join(dir_path,clean_name+ext)
-            if file_name!=clean_name: # Change file name if cleaning changes it
-                print(f"Changing the name to:\n{clean_name+ext}")
-                move(file_path,clean_file_path)
-                file_path=clean_file_path
-        flac_comment_formatter(file_path)
-    print("="*80)
-    print("Done!")
