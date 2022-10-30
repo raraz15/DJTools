@@ -5,7 +5,7 @@ import requests
 from mutagen import File
 from mutagen.id3 import ID3,APIC,TDRL,TPE1,TIT2,TCON,TPUB
 
-from utils.file_name_organizer import clean_file_name
+from utils.file_name_organizer import file_name_cleaner
 
 sys.path.append("/Users/recep_oguz_araz/Projects/electronic_music_downloader")
 
@@ -63,6 +63,7 @@ def clean_tags(file_path):
     # Save the tags
     audio.save(v2_version=3)
 
+# TODO: get track name from tags or title? do not use clean_file_name
 def find_missing_tags(file_path):
     audio=ID3(file_path)
     # Search if any of the tags don't exist
@@ -73,7 +74,7 @@ def find_missing_tags(file_path):
     if failed:
         print("Some of the tags are missing. Making a Beatport query....")
         file_name=os.path.splitext(os.path.basename(file_path))[0]
-        clean_name=clean_file_name(file_name)
+        clean_name=file_name_cleaner(file_name)
         # Scrape Information from beatport
         beatport_url=make_beatport_query(clean_name)
         print(f"Beatport URL: {beatport_url}")
