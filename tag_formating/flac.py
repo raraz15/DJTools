@@ -14,6 +14,8 @@ from emd.beatport.track_scraper import scrape_track
 
 def clean_tags(file_path):
     audio=FLAC(file_path)
+    # Remove unnecessary keys directly
+    print("Removing unnecessary tags...")
     for key in audio.keys():
         if key not in KEYS:
             audio.pop(key)
@@ -25,6 +27,7 @@ def format_title_artist(file_path):
     artist=" , ".join(audio['artist'])
     title=audio['title'][0]
     # Format the title and the artist
+    print("Formating the flac Title and Artist")
     artist=re.sub(";",",",artist)
     artist=re.sub(" ,",", ",artist)
     artist=re.sub(r"\s\s+"," ",artist) # Multiple whitespaces
@@ -55,8 +58,8 @@ def format_title_artist(file_path):
 def insert_artwork(file_path):
     audio=FLAC(file_path)
     if not audio.pictures:
+        print("Album artwork not found. Making a Beatport Query.")
         track=f"{audio['artist'][0]} - {audio['title'][0]}"
-        print(track)
         beatport_url=make_beatport_query(track)
         if not beatport_url:
             print("Beatport search failed.")
@@ -66,6 +69,7 @@ def insert_artwork(file_path):
             print(json.dumps(track_dict,indent=4))
             response=requests.get(track_dict["Image URL"])
             if response.status_code==200:
+                print("Album Cover inserted.")
                 image=Picture()
                 image.type=3
                 image.mime='image/jpeg'
@@ -74,7 +78,7 @@ def insert_artwork(file_path):
                 audio.add_picture(image)
                 audio.save()
             else:
-                print("Image couldn't be downloaded.")
+                print("Couldn't download the image.")
 
 def comment_formatter(file_path):
     clean_tags(file_path)

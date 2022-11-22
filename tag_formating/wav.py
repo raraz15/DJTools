@@ -5,7 +5,7 @@ import requests
 from mutagen.wave import WAVE
 from mutagen.id3 import APIC,TDRL,TPE1,TIT2,TCON,TPUB
 
-from utils.file_name_organizer import clean_file_name
+from utils.file_name_organizer import file_name_cleaner
 
 sys.path.append("/Users/recep_oguz_araz/Projects/electronic_music_downloader")
 
@@ -22,13 +22,13 @@ KEYS=["APIC", # Image
 # TODO: simplify?
 def clean_tags(file_path):
     audio=WAVE(file_path)
-    print("Removing unnecessary tags...")
     # Remove unnecessary keys directly
+    print("Removing unnecessary tags...")
     for key in list(audio.keys()):
         if key not in KEYS:
             audio.pop(key)
-    print(f"Cleaning the texts of the tags...")
     # Clean and format the tags
+    print(f"Formating the tags...")
     for key in list(audio.keys()):
         # Only check non-image and non-time-stamp keys
         if key not in["APIC","TDRL"]:
@@ -66,7 +66,7 @@ def find_missing_tags(file_path):
     if failed:
         print("Some of the tags are missing. Making a Beatport query....")
         file_name=os.path.splitext(os.path.basename(file_path))[0]
-        clean_name=clean_file_name(file_name)
+        clean_name=file_name_cleaner(file_name)
         # Scrape Information from beatport
         beatport_url=make_beatport_query(clean_name)
         if not beatport_url:
