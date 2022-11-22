@@ -32,10 +32,12 @@ def first_load(file_path):
 def clean_tags(file_path):
     audio=ID3(file_path)
     # Remove unnecessary keys directly
+    print("Removing unnecessary tags...")
     for key in list(audio.keys()):
         if key not in KEYS:
             audio.setall(key,[])
     # Clean and format the tags
+    print(f"Formating the tags...")
     for key in list(audio.keys()):
         # Only check non-image and non-time-stamp keys
         if  key not in["APIC","TDRL"]:
@@ -113,6 +115,5 @@ def find_missing_tags(file_path):
 
 def mp3_tag_formatter(file_path):
     first_load(file_path) # Load the ID3 tags
-    print(f"Cleaning the unnecessary tags...")
     clean_tags(file_path) # Clean the tags
     find_missing_tags(file_path) # Fill missing information

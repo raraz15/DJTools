@@ -22,13 +22,13 @@ KEYS=["APIC", # Image
 # TODO: simplify?
 def clean_tags(file_path):
     audio=WAVE(file_path)
-    print("Removing unnecessary tags...")
     # Remove unnecessary keys directly
+    print("Removing unnecessary tags...")
     for key in list(audio.keys()):
         if key not in KEYS:
             audio.pop(key)
-    print(f"Cleaning the texts of the tags...")
     # Clean and format the tags
+    print(f"Formating the tags...")
     for key in list(audio.keys()):
         # Only check non-image and non-time-stamp keys
         if key not in["APIC","TDRL"]:
