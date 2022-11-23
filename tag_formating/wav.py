@@ -28,7 +28,7 @@ def clean_tags(file_path):
         if key not in KEYS:
             audio.pop(key)
     # Clean and format the tags
-    print(f"Formating the tags...")
+    print(f"Formating remaining tags...")
     for key in list(audio.keys()):
         # Only check non-image and non-time-stamp keys
         if key not in["APIC","TDRL"]:
@@ -64,7 +64,7 @@ def find_missing_tags(file_path):
         failed+=key not in list(audio.keys())
     # If a tag is missing search for it in Beatport
     if failed:
-        print("Some of the tags are missing. Making a Beatport query....")
+        print("Some necessary tags are missing. Making a Beatport query....")
         file_name=os.path.splitext(os.path.basename(file_path))[0]
         clean_name=file_name_cleaner(file_name)
         # Scrape Information from beatport
@@ -80,23 +80,29 @@ def find_missing_tags(file_path):
                     if key=="TPE1":
                         txt=track_dict["Artist(s)"]
                         audio['TPE1']=TPE1(encoding=3,text=txt)
+                        print(f"Artist tag saved: {txt}")
                     elif key=="TIT2":
                         txt=track_dict["Title"]
                         if track_dict["Mix"]:
                             txt+=f" ({track_dict['Mix']})"
                         audio['TIT2']=TIT2(encoding=3,text=txt)
+                        print(f"Title tag saved: {txt}")
                     elif key=="TCON":
                         txt=track_dict["Genre"]
                         audio['TCON']=TCON(encoding=3,text=txt)
+                        print(f"Genre tag saved: {txt}")
                     elif key=="TPUB":
                         txt=track_dict["Label"]
                         audio['TPUB']=TPUB(encoding=3,text=txt)
+                        print(f"Label tag saved: {txt}")
                     elif key=="TDRL":
                         txt=track_dict["Released"]
                         audio['TDRL']=TDRL(encoding=3,text=txt)
+                        print(f"Released tag saved: {txt}")
                     elif key=="APIC":
                         req=requests.get(track_dict["Image URL"])
                         audio["APIC"]=APIC(3,'image/jpg',3,'Front cover',req.content)
+                        print(f"Album Cover saved")
                     else:
                         continue
         # Save the tags

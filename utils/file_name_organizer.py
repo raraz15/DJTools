@@ -26,7 +26,9 @@ def file_name_cleaner(file_name):
     file_name=re.sub(r"www\..*\.[com|net]","",file_name) # Remove urls
     file_name=re.sub(r"\s-\s*main\s[0-9]{3}","",file_name)
     # Deal with feat
-    file_name=re.sub(r"Feat|Ft|ft",r"feat",file_name)
+    file_name=re.sub(r"Feat",r"feat",file_name)
+    file_name=re.sub(r"\sFt"," feat",file_name)
+    file_name=re.sub(r"\sft"," feat",file_name)
     m=re.search(r"feat",file_name)
     if m and file_name[m.end():m.end()+2]!=". ":
         file_name=file_name[:m.start()]+"feat. "+file_name[m.end():]
@@ -47,7 +49,7 @@ def file_name_cleaner(file_name):
     if "(feat. " in file_name: # - remains in the end
         idx=file_name.find(" - ")
         m=re.search(r"\s\(feat\.[^\()]+\)",file_name)
-        if m.start()>idx:
+        if m and m.start()>idx:
             feat_str=m.group()
             file_name=re.sub(r"\s\(feat\.[^\()]+\)","",file_name) # IS this a bug?
             file_name=file_name[:idx]+feat_str+file_name[idx:]
@@ -62,10 +64,10 @@ def clean_file_path(file_path):
     file_name=os.path.basename(file_path)
     dir_path=os.path.dirname(file_path)
     file_name,ext=os.path.splitext(file_name)
-    print(f"Input name:\n{file_name}")
+    print(f"File name: {file_name}")
     clean_file_name=file_name_cleaner(file_name)
     if file_name!=clean_file_name:
-        print(f"Cleaned name:\n{clean_file_name}")
+        print(f"Cleaned file name: {clean_file_name}")
         dest_path=os.path.join(dir_path,clean_file_name+ext)
         move(file_path,dest_path)
         return dest_path
