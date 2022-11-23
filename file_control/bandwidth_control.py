@@ -12,6 +12,7 @@ import librosa
 import librosa.display
 
 DATE=dt.datetime.strftime(dt.datetime.now(),"%d_%m_%Y")
+FIGURES_DIR=os.path.join("Figures",DATE)
 
 def check_bandwidth(y,nfft,L,sr,qt,thresh=-110):
     # Calculate the spectrogram
@@ -87,7 +88,7 @@ if __name__=="__main__":
 
     parser=argparse.ArgumentParser()
     parser.add_argument("-p","--path",type=str,required=True,help="Path to directory containing audio files.")
-    parser.add_argument("-o","--output",type=str,default=DATE,help="Directory for saving the sptectrograms.")
+    parser.add_argument("-o","--output",type=str,default=FIGURES_DIR,help="Directory for saving the sptectrograms.")
     args=parser.parse_args()
 
     success_dir=os.path.join(args.output,"success")
