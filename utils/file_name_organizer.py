@@ -88,7 +88,7 @@ if __name__=="__main__":
     # Clean the names of the files
     for i,file_path in enumerate(file_paths):
         print("="*40)
-        print(f"{i+1}/{len(file_paths)}")
+        print(f"[{i+1}/{len(file_paths)}]")
         clean_file_path(file_path)
     print("="*40)
     print("Done!")

@@ -23,7 +23,7 @@ if __name__=="__main__":
     try:
         for i,file_path in enumerate(file_paths):
             print("="*80)
-            print(f"{i+1}/{len(file_paths)}")
+            print(f"[{i+1}/{len(file_paths)}]")
             # File name cleaning
             file_path=clean_file_path(file_path)
             ext=os.path.splitext(file_path)[1]
