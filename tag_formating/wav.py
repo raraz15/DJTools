@@ -1,5 +1,6 @@
 import os,sys
 import re
+import json
 import requests
 
 from mutagen.wave import WAVE
@@ -74,6 +75,7 @@ def find_missing_tags(file_path):
         else:
             print(f"Beatport URL: {beatport_url}")
             track_dict=scrape_track(beatport_url)
+            print(json.dumps(track_dict,indent=4))
             # Fill desired tags if missing
             for key in KEYS:
                 if key not in list(audio.keys()):

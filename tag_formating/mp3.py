@@ -1,5 +1,6 @@
 import os,sys
 import re
+import json
 import requests
 
 from mutagen import File
@@ -95,6 +96,7 @@ def find_missing_tags(file_path):
             print("Beatport search failed.")
         else:
             track_dict=scrape_track(beatport_url)
+            print(json.dumps(track_dict,indent=4))
             # Fill tags if missing
             for key,val in check.items():
                 if not val and key=="TPE1":
