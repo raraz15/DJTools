@@ -25,7 +25,7 @@ def file_name_cleaner(file_name):
     file_name=re.sub(r"\A\s+","",file_name)
     file_name=re.sub(r"\s+\Z","",file_name)
     # Remove track number
-    file_name=re.sub(r"\A[0-9]{1,}(\.|-){0,1}\s{0,1}","",file_name)
+    file_name=re.sub(r"\A[0-9]{1,}\s{0,1}(\.|-){0,1}\s{0,1}","",file_name)
     # Multiple whitespaces
     file_name=re.sub(r"\s\s+"," ",file_name)
     # Replace [] with () around the Mix
