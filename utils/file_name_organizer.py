@@ -40,7 +40,7 @@ def file_name_cleaner(file_name):
     # main
     file_name=re.sub(r"\s-\s*main\s[0-9]{3}","",file_name)
     # Deal with feat
-    file_name=re.sub(r"Feat",r"feat",file_name)
+    file_name=re.sub("Feat","feat",file_name)
     file_name=re.sub(r"\sFt\s*"," feat",file_name)
     file_name=re.sub(r"\sft\s*"," feat",file_name)
     m=re.search(r"feat",file_name)
@@ -53,8 +53,7 @@ def file_name_cleaner(file_name):
             feat_remixer.pop(-1)
         feat_remixer="feat. "+" ".join(feat_remixer)
         file_name=re.sub(feat_remixer,f"({feat_remixer})",file_name)
-    if "feat. " in file_name:
-        # Remove the feat artist from the Producers part
+    if "feat. " in file_name: # Remove the feat artist from the Producers part
         m=re.search(r"\(feat\.[^\()]+\)",file_name)
         remixer=file_name[m.start()+7:m.end()-1]
         idx=file_name.find(remixer)
