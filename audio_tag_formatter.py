@@ -14,11 +14,10 @@ if __name__=="__main__":
     args=parser.parse_args()
 
     # Find the audio file paths
-    file_paths=[]
-    for ext in EXT:
-        file_paths+=glob(f"{args.path}/*{ext}")
-    file_paths=sorted(file_paths)
+    file_paths=sorted([path for ext in EXT for path in glob(f"{args.path}/*{ext}")])
     print(f"{len(file_paths)} tracks found in:\n{args.path}")
+    
+    # Clean all the files
     print("Starting the cleanup process...")
     try:
         for i,file_path in enumerate(file_paths):
