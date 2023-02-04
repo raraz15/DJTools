@@ -64,10 +64,10 @@ def clean_file_path(file_path):
     file_name=os.path.basename(file_path)
     dir_path=os.path.dirname(file_path)
     file_name,ext=os.path.splitext(file_name)
-    print(f"File name: {file_name}")
+    print(f"File name: {file_name}{ext}")
     clean_file_name=file_name_cleaner(file_name)
     if file_name!=clean_file_name:
-        print(f"Cleaned file name: {clean_file_name}")
+        print(f"Cleaned file name: {clean_file_name}{ext}")
         dest_path=os.path.join(dir_path,clean_file_name+ext)
         move(file_path,dest_path)
         return dest_path
