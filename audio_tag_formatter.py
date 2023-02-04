@@ -16,7 +16,7 @@ if __name__=="__main__":
     # Find the audio file paths
     file_paths=sorted([path for ext in EXT for path in glob(f"{args.path}/*{ext}")])
     print(f"{len(file_paths)} tracks found in:\n{args.path}")
-    
+
     # Clean all the files
     print("Starting the cleanup process...")
     try:

@@ -6,7 +6,7 @@ from shutil import move
 
 EXT=[".mp3",".flac",".wav"]
 
-# TODO: #Initial key, bpm cleanng does not work
+# TODO: Initial key, bpm cleanng does not work
 # TODO: Better Version Capitalize
 def file_name_cleaner(file_name):
     """Expects the file name without the extension."""
@@ -81,13 +81,12 @@ if __name__=="__main__":
     args=parser.parse_args()
 
     # Get the paths of audio files
-    file_paths=[]
-    for ext in EXT:
-        file_paths+=glob(f"{args.path}/*{ext}")
-    file_paths=sorted(file_paths)
+    file_paths=sorted([path for ext in EXT for path in glob(f"{args.path}/*{ext}")])
+    print(f"{len(file_paths)} tracks found in:\n{args.path}")
+
     # Clean the names of the files
     for i,file_path in enumerate(file_paths):
-        print("="*40)
+        print("="*80)
         print(f"[{i+1}/{len(file_paths)}]")
         clean_file_path(file_path)
     print("="*40)
