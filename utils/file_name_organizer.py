@@ -11,23 +11,22 @@ EXT=[".mp3",".flac",".wav"]
 def file_name_cleaner(file_name):
     """Expects the file name without the extension."""
 
+    # Whitespaces
+    file_name=re.sub(r"\s\s+"," ",file_name) # Multiple
+    file_name=re.sub(r"\A\s+","",file_name) # Leading
+    file_name=re.sub(r"\s+\Z","",file_name) # Trailing
     # Delete the BPM and Key information from Leading and Trailing
     file_name=re.sub(r"\A[0-9]{1,2}[A-B]\s-\s[0-9]{0,3}\s-\s","",file_name)
     file_name=re.sub(r"\A[0-9]{0,3}\s-\s[0-9]{1,2}[A-B]\s-\s","",file_name)
     file_name=re.sub(r"\s-\s[0-9]{1,2}[A-B]\s-\s[0-9]{0,3}\Z","",file_name)
     file_name=re.sub(r"\s-\s[0-9]{0,3}\s-\s[0-9]{1,2}[A-B]\Z","",file_name)
     # if_the_file-name_is_like_this
-    if " " not in file_name:
+    if (" " not in file_name) and ("_" in file_name):
         file_name=re.sub("_"," ",file_name)
         file_name=re.sub("-"," - ",file_name)
         file_name=file_name.title()
-    # Leading and Trailing whitespaces
-    file_name=re.sub(r"\A\s+","",file_name)
-    file_name=re.sub(r"\s+\Z","",file_name)
     # Remove track number
     file_name=re.sub(r"\A[0-9]{1,}\s{0,1}(\.|-){0,1}\s{0,1}","",file_name)
-    # Multiple whitespaces
-    file_name=re.sub(r"\s\s+"," ",file_name)
     # Replace [] with () around the Mix
     m=re.search(r"\[.*(M|m)ix\]",file_name)
     if m:
