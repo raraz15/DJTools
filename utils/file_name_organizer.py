@@ -11,36 +11,39 @@ EXT=[".mp3",".flac",".wav"]
 def file_name_cleaner(file_name):
     """Expects the file name without the extension."""
 
-    # Delete the BPM and Key information
+    # Delete the BPM and Key information from Leading and Trailing
     file_name=re.sub(r"\A[0-9]{1,2}[A-B]\s-\s[0-9]{0,3}\s-\s","",file_name)
     file_name=re.sub(r"\A[0-9]{0,3}\s-\s[0-9]{1,2}[A-B]\s-\s","",file_name)
+    file_name=re.sub(r"\s-\s[0-9]{1,2}[A-B]\s-\s[0-9]{0,3}\Z","",file_name)
+    file_name=re.sub(r"\s-\s[0-9]{0,3}\s-\s[0-9]{1,2}[A-B]\Z","",file_name)
     # if_the_file-name_is_like_this
     if " " not in file_name:
         file_name=re.sub("_"," ",file_name)
         file_name=re.sub("-"," - ",file_name)
         file_name=file_name.title()
-    # Track number, or leading whitespaces ???
-    file_name=re.sub(r"\A[^a-zA-Z]+","",file_name)
-    # Trailing whitespaces
+    # Leading and Trailing whitespaces
+    file_name=re.sub(r"\A\s+","",file_name)
     file_name=re.sub(r"\s+\Z","",file_name)
-     # Multiple whitespaces
+    # Remove track number
+    file_name=re.sub(r"\A[0-9]{1,}(\.|-){0,1}\s{0,1}","",file_name)
+    # Multiple whitespaces
     file_name=re.sub(r"\s\s+"," ",file_name)
     # Replace [] with () around the Mix
-    m=re.search(r"\[.*[M|m]ix\]",file_name)
+    m=re.search(r"\[.*(M|m)ix\]",file_name)
     if m:
         file_name=file_name[:m.start()]+f"({m[0][1:-1]})"+file_name[m.end():]
     # Capitalize Mix type
-    m=re.search(r"\([^\)]*[M|m]ix\)",file_name)
+    m=re.search(r"\([^\)]*(M|m)ix\)",file_name)
     if m:
         file_name=file_name[:m.start()]+f"{m[0]}".title()+file_name[m.end():]
     # Remove urls
-    file_name=re.sub(r"\s*-*\s*www\..*\.(com|net)\s*","",file_name)
+    file_name=re.sub(r"\s*-*\s*www\..*\.(com|net|org)\s*","",file_name)
     # main
     file_name=re.sub(r"\s-\s*main\s[0-9]{3}","",file_name)
     # Deal with feat
     file_name=re.sub(r"Feat",r"feat",file_name)
-    file_name=re.sub(r"\sFt"," feat",file_name)
-    file_name=re.sub(r"\sft"," feat",file_name)
+    file_name=re.sub(r"\sFt\s*"," feat",file_name)
+    file_name=re.sub(r"\sft\s*"," feat",file_name)
     m=re.search(r"feat",file_name)
     if m and file_name[m.end():m.end()+2]!=". ":
         file_name=file_name[:m.start()]+"feat. "+file_name[m.end():]
@@ -63,14 +66,12 @@ def file_name_cleaner(file_name):
         m=re.search(r"\s\(feat\.[^\()]+\)",file_name)
         if m and m.start()>idx:
             feat_str=m.group()
-            file_name=re.sub(r"\s\(feat\.[^\()]+\)","",file_name) # IS this a bug?
+            file_name=re.sub(r"\s\(feat\.[^\()]+\)","",file_name) # Is this a bug?
             file_name=file_name[:idx]+feat_str+file_name[idx:]
     # Further Cleaning
     file_name=re.sub(";",",",file_name)
     file_name=re.sub("Dj","DJ",file_name)
-    file_name=re.sub(r"[0-9][A-Z]\s-\s[0-9]{2,4}\s-\s","",file_name) # Key,BPM
-    file_name=re.sub(r"\s-\s[0-9][A-Z]\s-\s[0-9]{2,4}","",file_name) # Key,BPM
-    file_name=re.sub(r"\s\-\s+\Z","",file_name) # - 
+    #file_name=re.sub(r"\s\-\s+\Z","",file_name) # - 
     return file_name
 
 def clean_file_path(file_path):
@@ -96,7 +97,6 @@ if __name__=="__main__":
     # Get the paths of audio files
     file_paths=sorted([path for ext in EXT for path in glob(f"{args.path}/*{ext}")])
     print(f"{len(file_paths)} tracks found in:\n{args.path}")
-
     # Clean the names of the files
     for i,file_path in enumerate(file_paths):
         print("="*80)
