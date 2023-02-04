@@ -6,7 +6,7 @@ from shutil import move
 
 EXT=[".mp3",".flac",".wav"]
 
-# TODO: url removal
+
 # TODO: Better Version Capitalize
 def file_name_cleaner(file_name):
     """Expects the file name without the extension."""
@@ -34,7 +34,7 @@ def file_name_cleaner(file_name):
     if m:
         file_name=file_name[:m.start()]+f"{m[0]}".title()+file_name[m.end():]
     # Remove urls
-    file_name=re.sub(r"www\..*\.[com|net]\s*","",file_name)
+    file_name=re.sub(r"\s*-*\s*www\..*\.(com|net)\s*","",file_name)
     # main
     file_name=re.sub(r"\s-\s*main\s[0-9]{3}","",file_name)
     # Deal with feat
