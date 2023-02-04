@@ -6,24 +6,36 @@ from shutil import move
 
 EXT=[".mp3",".flac",".wav"]
 
-# TODO: Initial key, bpm cleanng does not work
+# TODO: url removal
 # TODO: Better Version Capitalize
 def file_name_cleaner(file_name):
     """Expects the file name without the extension."""
-    if " " not in file_name: # if_the_file-name_is_like_this
+
+    # Delete the BPM and Key information
+    file_name=re.sub(r"\A[0-9]{1,2}[A-B]\s-\s[0-9]{0,3}\s-\s","",file_name)
+    file_name=re.sub(r"\A[0-9]{0,3}\s-\s[0-9]{1,2}[A-B]\s-\s","",file_name)
+    # if_the_file-name_is_like_this
+    if " " not in file_name:
         file_name=re.sub("_"," ",file_name)
         file_name=re.sub("-"," - ",file_name)
         file_name=file_name.title()
-    file_name=re.sub(r"\A[^a-zA-Z]+","",file_name) # Track number, or leading whitespaces
-    file_name=re.sub(r"\s+\Z","",file_name) # Trailing whitespaces
-    file_name=re.sub(r"\s\s+"," ",file_name) # Multiple whitespaces
-    m=re.search(r"\[.*[M|m]ix\]",file_name) # Replace [] with () around the Mix
+    # Track number, or leading whitespaces ???
+    file_name=re.sub(r"\A[^a-zA-Z]+","",file_name)
+    # Trailing whitespaces
+    file_name=re.sub(r"\s+\Z","",file_name)
+     # Multiple whitespaces
+    file_name=re.sub(r"\s\s+"," ",file_name)
+    # Replace [] with () around the Mix
+    m=re.search(r"\[.*[M|m]ix\]",file_name)
     if m:
         file_name=file_name[:m.start()]+f"({m[0][1:-1]})"+file_name[m.end():]
-    m=re.search(r"\([^\)]*[M|m]ix\)",file_name) # Capitalize Mix type
+    # Capitalize Mix type
+    m=re.search(r"\([^\)]*[M|m]ix\)",file_name)
     if m:
         file_name=file_name[:m.start()]+f"{m[0]}".title()+file_name[m.end():]
-    file_name=re.sub(r"www\..*\.[com|net]","",file_name) # Remove urls
+    # Remove urls
+    file_name=re.sub(r"www\..*\.[com|net]\s*","",file_name)
+    # main
     file_name=re.sub(r"\s-\s*main\s[0-9]{3}","",file_name)
     # Deal with feat
     file_name=re.sub(r"Feat",r"feat",file_name)
@@ -53,6 +65,7 @@ def file_name_cleaner(file_name):
             feat_str=m.group()
             file_name=re.sub(r"\s\(feat\.[^\()]+\)","",file_name) # IS this a bug?
             file_name=file_name[:idx]+feat_str+file_name[idx:]
+    # Further Cleaning
     file_name=re.sub(";",",",file_name)
     file_name=re.sub("Dj","DJ",file_name)
     file_name=re.sub(r"[0-9][A-Z]\s-\s[0-9]{2,4}\s-\s","",file_name) # Key,BPM
