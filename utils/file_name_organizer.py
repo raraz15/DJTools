@@ -70,7 +70,6 @@ def file_name_cleaner(file_name):
     # Further Cleaning
     file_name=re.sub(";",",",file_name)
     file_name=re.sub("Dj","DJ",file_name)
-    #file_name=re.sub(r"\s\-\s+\Z","",file_name) # - 
     return file_name
 
 def clean_file_path(file_path):
