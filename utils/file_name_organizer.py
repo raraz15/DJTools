@@ -11,6 +11,11 @@ EXT=[".mp3",".flac",".wav"]
 def file_name_cleaner(file_name):
     """Expects the file name without the extension."""
 
+    # If file-name_is_like_this => file - name is like this
+    if (" " not in file_name) and ("_" in file_name):
+        file_name=re.sub("_"," ",file_name)
+        file_name=re.sub("-"," - ",file_name)
+        file_name=file_name.title()
     # Whitespaces
     file_name=re.sub(r"\s\s+"," ",file_name) # Multiple
     file_name=re.sub(r"\A\s+","",file_name) # Leading
@@ -20,13 +25,10 @@ def file_name_cleaner(file_name):
     file_name=re.sub(r"\A[0-9]{0,3}\s-\s[0-9]{1,2}[A-B]\s-\s","",file_name)
     file_name=re.sub(r"\s-\s[0-9]{1,2}[A-B]\s-\s[0-9]{0,3}\Z","",file_name)
     file_name=re.sub(r"\s-\s[0-9]{0,3}\s-\s[0-9]{1,2}[A-B]\Z","",file_name)
-    # if_the_file-name_is_like_this
-    if (" " not in file_name) and ("_" in file_name):
-        file_name=re.sub("_"," ",file_name)
-        file_name=re.sub("-"," - ",file_name)
-        file_name=file_name.title()
     # Remove track number
     file_name=re.sub(r"\A[0-9]{1,}\s{0,1}(\.|-){0,1}\s{0,1}","",file_name)
+    # Remove urls
+    file_name=re.sub(r"\s*-*\s*www\..*\.(com|net|org)\s*","",file_name)
     # Replace [] with () around the Mix
     m=re.search(r"\[.*(M|m)ix\]",file_name)
     if m:
@@ -35,8 +37,6 @@ def file_name_cleaner(file_name):
     m=re.search(r"\([^\)]*(M|m)ix\)",file_name)
     if m:
         file_name=file_name[:m.start()]+f"{m[0]}".title()+file_name[m.end():]
-    # Remove urls
-    file_name=re.sub(r"\s*-*\s*www\..*\.(com|net|org)\s*","",file_name)
     # main
     file_name=re.sub(r"\s-\s*main\s[0-9]{3}","",file_name)
     # Deal with feat
