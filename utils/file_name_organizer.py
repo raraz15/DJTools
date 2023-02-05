@@ -18,16 +18,16 @@ def file_name_cleaner(file_name):
         file_name=file_name.title()
     # Whitespaces
     file_name=re.sub(r"\s\s+"," ",file_name) # Multiple
-    file_name=re.sub(r"\A\s+","",file_name) # Leading
-    file_name=re.sub(r"\s+\Z","",file_name) # Trailing
-    # Delete the BPM and Key information from Leading and Trailing
-    file_name=re.sub(r"\A[0-9]{1,2}[A-B]\s-\s[0-9]{0,3}\s-\s","",file_name)
-    file_name=re.sub(r"\A[0-9]{0,3}\s-\s[0-9]{1,2}[A-B]\s-\s","",file_name)
-    file_name=re.sub(r"\s-\s[0-9]{1,2}[A-B]\s-\s[0-9]{0,3}\Z","",file_name)
-    file_name=re.sub(r"\s-\s[0-9]{0,3}\s-\s[0-9]{1,2}[A-B]\Z","",file_name)
-    # Remove track number
+    file_name=re.sub(r"\A\s+","",file_name)  # Leading
+    file_name=re.sub(r"\s+\Z","",file_name)  # Trailing
+    # Delete the BPM and/or Key information from Leading and Trailing
+    file_name=re.sub(r"\A([0-9]{1,2}(A|B)\s-\s){0,1}([0-9]{0,3}\s-\s){0,1}","",file_name)
+    file_name=re.sub(r"\A([0-9]{0,3}\s-\s){0,1}([0-9]{1,2}(A|B)\s-\s){0,1}","",file_name)
+    file_name=re.sub(r"(\s-\s[0-9]{1,2}(A|B)){0,1}(\s-\s[0-9]{0,3}){0,1}\Z","",file_name)
+    file_name=re.sub(r"(\s-\s[0-9]{0,3}){0,1}(\s-\s[0-9]{1,2}(A|B)){0,1}\Z","",file_name)
+    # Remove track number (or BPM)
     file_name=re.sub(r"\A[0-9]{1,}\s{0,1}(\.|-){0,1}\s{0,1}","",file_name)
-    # Remove urls
+    # Remove URLs
     file_name=re.sub(r"\s*-*\s*www\..*\.(com|net|org)\s*","",file_name)
     # Replace [] with () around the Mix
     m=re.search(r"\[.*(M|m)ix\]",file_name)
