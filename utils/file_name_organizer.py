@@ -27,6 +27,7 @@ def file_name_cleaner(file_name):
     file_name=re.sub(r"(\s-\s[0-9]{0,3}){0,1}(\s-\s[0-9]{1,2}(A|B)){0,1}\Z","",file_name)
     # Remove track number (or BPM)
     file_name=re.sub(r"\A[0-9]{1,}\s{0,1}(\.|-){0,1}\s{0,1}","",file_name)
+    file_name=re.sub(r"\A\s{0,1}-\s","",file_name)
     # Remove URLs
     file_name=re.sub(r"\s*-*\s*www\..*\.(com|net|org)\s*","",file_name)
     # Replace [] with () around the Mix
