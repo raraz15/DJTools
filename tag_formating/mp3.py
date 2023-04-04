@@ -96,35 +96,40 @@ def find_missing_tags(file_path):
             print("Beatport search failed.")
         else:
             track_dict=scrape_track(beatport_url)
-            print(json.dumps(track_dict,indent=4))
-            # Fill tags if missing
-            for key,val in check.items():
-                if not val and key=="TPE1":
-                    txt=track_dict["Artist(s)"]
-                    audio['TPE1']=TPE1(encoding=3,text=txt)
-                    print(f"Artist tag saved: {txt}")
-                elif not val and key=="TIT2":
-                    txt=track_dict["Title"]
-                    if track_dict["Mix"]:
-                        txt+=f" ({track_dict['Mix']})"
-                    audio['TIT2']=TIT2(encoding=3,text=txt)
-                    print(f"Title tag saved: {txt}")
-                elif not val and key=="TCON":
-                    txt=track_dict["Genre"]
-                    audio['TCON']=TCON(encoding=3,text=txt)
-                    print(f"Genre tag saved: {txt}")
-                elif not val and key=="TPUB":
-                    txt=track_dict["Label"]
-                    audio['TPUB']=TPUB(encoding=3,text=txt)
-                    print(f"Label tag saved: {txt}")
-                elif not val and key=="TDRL":
-                    txt=track_dict["Released"]
-                    audio['TDRL']=TDRL(encoding=3,text=txt)
-                    print(f"Released tag saved: {txt}")
-                elif not val and KEYS[0] in key:
-                    req=requests.get(track_dict["Image URL"])
-                    audio["APIC"]=APIC(3,'image/jpg',3,'Front cover',req.content)
-                    print(f"Album Cover saved")
+            if track_dict=={}:
+                print("Could not scrape the information.")
+                with open(file_path+".log", "w") as o_file:
+                    o_file.write(beatport_url)
+            else:
+                print(json.dumps(track_dict,indent=4))
+                # Fill tags if missing
+                for key,val in check.items():
+                    if not val and key=="TPE1":
+                        txt=track_dict["Artist(s)"]
+                        audio['TPE1']=TPE1(encoding=3,text=txt)
+                        print(f"Artist tag saved: {txt}")
+                    elif not val and key=="TIT2":
+                        txt=track_dict["Title"]
+                        if track_dict["Mix"]:
+                            txt+=f" ({track_dict['Mix']})"
+                        audio['TIT2']=TIT2(encoding=3,text=txt)
+                        print(f"Title tag saved: {txt}")
+                    elif not val and key=="TCON":
+                        txt=track_dict["Genre"]
+                        audio['TCON']=TCON(encoding=3,text=txt)
+                        print(f"Genre tag saved: {txt}")
+                    elif not val and key=="TPUB":
+                        txt=track_dict["Label(s)"]
+                        audio['TPUB']=TPUB(encoding=3,text=txt)
+                        print(f"Label tag saved: {txt}")
+                    elif not val and key=="TDRL":
+                        txt=track_dict["Released"]
+                        audio['TDRL']=TDRL(encoding=3,text=txt)
+                        print(f"Released tag saved: {txt}")
+                    elif not val and KEYS[0] in key:
+                        req=requests.get(track_dict["Image URL"])
+                        audio["APIC"]=APIC(3,'image/jpg',3,'Front cover',req.content)
+                        print(f"Album Cover saved")
         # Save the tags
         audio.save(v2_version=3)
         print("Saved the tags!")
