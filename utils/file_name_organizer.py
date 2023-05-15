@@ -29,13 +29,13 @@ def file_name_cleaner(file_name):
     file_name=re.sub(r"\A[0-9]{1,}\s{0,1}(\.|-){0,1}\s{0,1}","",file_name)
     file_name=re.sub(r"\A\s{0,1}-\s","",file_name)
     # Remove URLs
-    file_name=re.sub(r"\s*-*\s*www\..*\.(com|net|org)\s*","",file_name)
+    file_name=re.sub(r"\s{,1}-{,1}\s{,1}(\[|\(){,1}(www\.){,1}\w*?\.(com|net|org)(\]|\)){,1}\s{,1}","",file_name)
     # Replace [] with () around the Mix
-    m=re.search(r"\[.*(M|m)ix\]",file_name)
+    m=re.search(r"\[.*[Mm]ix\]",file_name)
     if m:
         file_name=file_name[:m.start()]+f"({m[0][1:-1]})"+file_name[m.end():]
     # Capitalize Mix type
-    m=re.search(r"\([^\)]*(M|m)ix\)",file_name)
+    m=re.search(r"\([^\)]*[Mm]ix\)",file_name)
     if m:
         file_name=file_name[:m.start()]+f"{m[0]}".title()+file_name[m.end():]
     # main
